@@ -16,10 +16,11 @@ export type CircleShapeTransition = {
 };
 
 export class CircleShapeTransitionBuilder {
+  private _context: Context;
+
   private _centerX?: Transition<Coordinate | undefined>;
   private _centerY?: Transition<Coordinate | undefined>;
   private _radius?: Transition<Length | undefined>;
-  private _context: Context;
 
   constructor({ context }: { context: Context }) {
     this._context = context;
