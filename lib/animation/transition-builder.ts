@@ -9,7 +9,7 @@ import {
   StrokeLinejoin,
   Visibility,
 } from 'lib/data-types';
-import { Easing, easeInOutQubic, easeLinear } from 'lib/easing';
+import { Easing, easeInOutCubic, easeLinear } from 'lib/easing';
 import {
   CircleShapeTransitionBuilder,
   EmptyShape,
@@ -59,7 +59,7 @@ export class TransitionBuilder {
   public zIndex(
     zIndex: RequestFunction<number> | ReactiveValue<number> | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateNumber,
     }: {
       easing?: Easing;
@@ -101,7 +101,7 @@ export class TransitionBuilder {
       | undefined
       | string,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateColorRGB,
     }: {
       easing?: Easing;
@@ -141,7 +141,7 @@ export class TransitionBuilder {
       | Cursor
       | undefined,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateDiscrete,
     }: {
       easing?: Easing;
@@ -184,7 +184,7 @@ export class TransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateAlphaValue,
     }: {
       easing?: Easing;
@@ -229,7 +229,7 @@ export class TransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateAlphaValue,
     }: {
       easing?: Easing;
@@ -274,7 +274,7 @@ export class TransitionBuilder {
       | undefined
       | string,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateColorRGB,
     }: {
       easing?: Easing;
@@ -319,7 +319,7 @@ export class TransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateAlphaValue,
     }: {
       easing?: Easing;
@@ -364,7 +364,7 @@ export class TransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateLength,
     }: {
       easing?: Easing;
@@ -408,7 +408,7 @@ export class TransitionBuilder {
       | StrokeLinecap
       | undefined,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateDiscrete,
     }: {
       easing?: Easing;
@@ -450,7 +450,7 @@ export class TransitionBuilder {
       | StrokeLinejoin
       | undefined,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateDiscrete,
     }: {
       easing?: Easing;
@@ -493,7 +493,7 @@ export class TransitionBuilder {
       | number
       | undefined,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateDelta,
     }: {
       easing?: Easing;
@@ -537,7 +537,7 @@ export class TransitionBuilder {
       | StrokeDasharray
       | undefined,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateDiscrete,
     }: {
       easing?: Easing;
@@ -580,7 +580,7 @@ export class TransitionBuilder {
       | number
       | undefined,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateLength,
     }: {
       easing?: Easing;
@@ -624,7 +624,7 @@ export class TransitionBuilder {
       | Visibility
       | undefined,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateDiscrete,
     }: {
       easing?: Easing;

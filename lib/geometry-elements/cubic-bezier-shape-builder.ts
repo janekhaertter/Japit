@@ -1,8 +1,12 @@
 import { Transition } from 'lib/animation';
-import { Coordinate } from 'lib/data-types';
-import { Easing, easeInOutQubic } from 'lib/easing';
+import { Coordinate, Position } from 'lib/data-types';
+import { Easing, easeInOutCubic } from 'lib/easing';
 import { Interpolation, interpolateCoordinate } from 'lib/interpolation';
-import { ReactiveValue, ensureReactive } from 'lib/reactive-values';
+import {
+  ReactiveValue,
+  ensureReactive,
+  positionToCoordinates,
+} from 'lib/reactive-values';
 import { Context, RequestFunction } from 'lib/request-functions';
 
 export type CubicBezierShapeTransition = {
@@ -61,7 +65,7 @@ export class CubicBezierShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -101,7 +105,7 @@ export class CubicBezierShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -126,6 +130,41 @@ export class CubicBezierShapeTransitionBuilder {
   }
 
   /**
+   * Transitions the starting point of the line.
+   * @param start - The starting position to transition to.
+   * @param easing - The easing function to use.
+   * @param interpolation - The interpolation function to use.
+   * @returns The current {@link CubicBezierShapeTransitionBuilder} instance.
+   */
+  public start(
+    start:
+      | RequestFunction<Position | undefined>
+      | ReactiveValue<Position | undefined>
+      | Position
+      | undefined,
+    {
+      easing = easeInOutCubic,
+      interpolation = interpolateCoordinate,
+    }: {
+      easing?: Easing;
+      interpolation?: Interpolation<Coordinate | undefined>;
+    } = {},
+  ): CubicBezierShapeTransitionBuilder {
+    if (typeof start === 'function') {
+      start = start(this._context);
+    }
+
+    start = ensureReactive(start);
+
+    const { x, y } = positionToCoordinates(start);
+
+    this.startX(x, { easing, interpolation });
+    this.startY(y, { easing, interpolation });
+
+    return this;
+  }
+
+  /**
    * Transitions the x-coordinate of the first control point of the cubic bezier curve.
    * @param control1X - The x-coordinate to transition to.
    * @param easing - The easing function to use.
@@ -141,7 +180,7 @@ export class CubicBezierShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -181,7 +220,7 @@ export class CubicBezierShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -206,6 +245,41 @@ export class CubicBezierShapeTransitionBuilder {
   }
 
   /**
+   * Transitions the first control point of the cubic bezier curve.
+   * @param control1 - The first control point to transition to.
+   * @param easing - The easing function to use.
+   * @param interpolation - The interpolation function to use.
+   * @returns The current {@link CubicBezierShapeTransitionBuilder} instance.
+   */
+  public control1(
+    control1:
+      | RequestFunction<Position | undefined>
+      | ReactiveValue<Position | undefined>
+      | Position
+      | undefined,
+    {
+      easing = easeInOutCubic,
+      interpolation = interpolateCoordinate,
+    }: {
+      easing?: Easing;
+      interpolation?: Interpolation<Coordinate | undefined>;
+    } = {},
+  ): CubicBezierShapeTransitionBuilder {
+    if (typeof control1 === 'function') {
+      control1 = control1(this._context);
+    }
+
+    control1 = ensureReactive(control1);
+
+    const { x, y } = positionToCoordinates(control1);
+
+    this.control1X(x, { easing, interpolation });
+    this.control1Y(y, { easing, interpolation });
+
+    return this;
+  }
+
+  /**
    * Transitions the x-coordinate of the first control point of the cubic bezier curve.
    * @param control2X - The x-coordinate to transition to.
    * @param easing - The easing function to use.
@@ -221,7 +295,7 @@ export class CubicBezierShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -261,7 +335,7 @@ export class CubicBezierShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -286,6 +360,41 @@ export class CubicBezierShapeTransitionBuilder {
   }
 
   /**
+   * Transitions the second control point of the cubic bezier curve.
+   * @param control2 - The second control point to transition to.
+   * @param easing - The easing function to use.
+   * @param interpolation - The interpolation function to use.
+   * @returns The current {@link CubicBezierShapeTransitionBuilder} instance.
+   */
+  public control2(
+    control2:
+      | RequestFunction<Position | undefined>
+      | ReactiveValue<Position | undefined>
+      | Position
+      | undefined,
+    {
+      easing = easeInOutCubic,
+      interpolation = interpolateCoordinate,
+    }: {
+      easing?: Easing;
+      interpolation?: Interpolation<Coordinate | undefined>;
+    } = {},
+  ): CubicBezierShapeTransitionBuilder {
+    if (typeof control2 === 'function') {
+      control2 = control2(this._context);
+    }
+
+    control2 = ensureReactive(control2);
+
+    const { x, y } = positionToCoordinates(control2);
+
+    this.control2X(x, { easing, interpolation });
+    this.control2Y(y, { easing, interpolation });
+
+    return this;
+  }
+
+  /**
    * Transitions the x-coordinate of the ending point of the cubic bezier curve.
    * @param endX - The x-coordinate to transition to.
    * @param easing - The easing function to use.
@@ -301,7 +410,7 @@ export class CubicBezierShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -341,7 +450,7 @@ export class CubicBezierShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -361,6 +470,41 @@ export class CubicBezierShapeTransitionBuilder {
       easing,
       interpolation,
     };
+
+    return this;
+  }
+
+  /**
+   * Transitions the ending point of the line.
+   * @param end - The ending position to transition to.
+   * @param easing - The easing function to use.
+   * @param interpolation - The interpolation function to use.
+   * @returns The current {@link CubicBezierShapeTransitionBuilder} instance.
+   */
+  public end(
+    end:
+      | RequestFunction<Position | undefined>
+      | ReactiveValue<Position | undefined>
+      | Position
+      | undefined,
+    {
+      easing = easeInOutCubic,
+      interpolation = interpolateCoordinate,
+    }: {
+      easing?: Easing;
+      interpolation?: Interpolation<Coordinate | undefined>;
+    } = {},
+  ): CubicBezierShapeTransitionBuilder {
+    if (typeof end === 'function') {
+      end = end(this._context);
+    }
+
+    end = ensureReactive(end);
+
+    const { x, y } = positionToCoordinates(end);
+
+    this.endX(x, { easing, interpolation });
+    this.endY(y, { easing, interpolation });
 
     return this;
   }

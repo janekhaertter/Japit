@@ -1,7 +1,8 @@
-// The easing functions are taken from https://easings.net/
+// Most easing functions are taken from https://easings.net/
 
 export * from './easing';
 
-export * from './ease-linear.ts';
-export * from './ease-in-out-sine';
-export * from './ease-in-out-qubic.ts';
+export * from './ease-bounce';
+export * from './ease-cubic';
+export * from './ease-linear';
+export * from './ease-sine';

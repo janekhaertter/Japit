@@ -1,6 +1,6 @@
 import { Transition } from 'lib/animation';
 import { Coordinate, Length } from 'lib/data-types';
-import { Easing, easeInOutQubic } from 'lib/easing';
+import { Easing, easeInOutCubic } from 'lib/easing';
 import {
   Interpolation,
   interpolateCoordinate,
@@ -47,7 +47,7 @@ export class RectangleShapeBuilder {
   public x(
     x: ReactiveValue<Coordinate | undefined> | Coordinate | undefined | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -80,7 +80,7 @@ export class RectangleShapeBuilder {
   public y(
     y: ReactiveValue<Coordinate | undefined> | Coordinate | undefined | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -113,7 +113,7 @@ export class RectangleShapeBuilder {
   public width(
     width: ReactiveValue<Length | undefined> | Length | undefined | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateLength,
     }: {
       easing?: Easing;
@@ -146,7 +146,7 @@ export class RectangleShapeBuilder {
   public height(
     height: ReactiveValue<Length | undefined> | Length | undefined | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateLength,
     }: {
       easing?: Easing;
@@ -183,7 +183,7 @@ export class RectangleShapeBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateLength,
     }: {
       easing?: Easing;
@@ -220,7 +220,7 @@ export class RectangleShapeBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateLength,
     }: {
       easing?: Easing;

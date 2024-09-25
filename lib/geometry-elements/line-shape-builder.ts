@@ -1,8 +1,12 @@
 import { Transition } from 'lib/animation';
-import { Coordinate } from 'lib/data-types';
-import { Easing, easeInOutQubic } from 'lib/easing';
+import { Coordinate, Position } from 'lib/data-types';
+import { Easing, easeInOutCubic } from 'lib/easing';
 import { Interpolation, interpolateCoordinate } from 'lib/interpolation';
-import { ReactiveValue, ensureReactive } from 'lib/reactive-values';
+import {
+  ReactiveValue,
+  ensureReactive,
+  positionToCoordinates,
+} from 'lib/reactive-values';
 import { Context, RequestFunction } from 'lib/request-functions';
 
 export type LineShapeTransition = {
@@ -49,7 +53,7 @@ export class LineShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -89,7 +93,7 @@ export class LineShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -114,6 +118,41 @@ export class LineShapeTransitionBuilder {
   }
 
   /**
+   * Transitions the starting point of the line.
+   * @param start - The starting position to transition to.
+   * @param easing - The easing function to use.
+   * @param interpolation - The interpolation function to use.
+   * @returns The current {@link LineShapeTransitionBuilder} instance.
+   */
+  public start(
+    start:
+      | RequestFunction<Position | undefined>
+      | ReactiveValue<Position | undefined>
+      | Position
+      | undefined,
+    {
+      easing = easeInOutCubic,
+      interpolation = interpolateCoordinate,
+    }: {
+      easing?: Easing;
+      interpolation?: Interpolation<Coordinate | undefined>;
+    } = {},
+  ): LineShapeTransitionBuilder {
+    if (typeof start === 'function') {
+      start = start(this._context);
+    }
+
+    start = ensureReactive(start);
+
+    const { x, y } = positionToCoordinates(start);
+
+    this.startX(x, { easing, interpolation });
+    this.startY(y, { easing, interpolation });
+
+    return this;
+  }
+
+  /**
    * Transitions the x-coordinate of the ending point of the line.
    * @param endX - The x-coordinate to transition to.
    * @param easing - The easing function to use.
@@ -129,7 +168,7 @@ export class LineShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -169,7 +208,7 @@ export class LineShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -189,6 +228,41 @@ export class LineShapeTransitionBuilder {
       easing,
       interpolation,
     };
+
+    return this;
+  }
+
+  /**
+   * Transitions the ending point of the line.
+   * @param end - The ending position to transition to.
+   * @param easing - The easing function to use.
+   * @param interpolation - The interpolation function to use.
+   * @returns The current {@link LineShapeTransitionBuilder} instance.
+   */
+  public end(
+    end:
+      | RequestFunction<Position | undefined>
+      | ReactiveValue<Position | undefined>
+      | Position
+      | undefined,
+    {
+      easing = easeInOutCubic,
+      interpolation = interpolateCoordinate,
+    }: {
+      easing?: Easing;
+      interpolation?: Interpolation<Coordinate | undefined>;
+    } = {},
+  ): LineShapeTransitionBuilder {
+    if (typeof end === 'function') {
+      end = end(this._context);
+    }
+
+    end = ensureReactive(end);
+
+    const { x, y } = positionToCoordinates(end);
+
+    this.endX(x, { easing, interpolation });
+    this.endY(y, { easing, interpolation });
 
     return this;
   }

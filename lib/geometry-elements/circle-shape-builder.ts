@@ -1,12 +1,16 @@
 import { Transition } from 'lib/animation';
-import { Coordinate, Length } from 'lib/data-types';
-import { Easing, easeInOutQubic } from 'lib/easing';
+import { Coordinate, Length, Position } from 'lib/data-types';
+import { Easing, easeInOutCubic } from 'lib/easing';
 import {
   Interpolation,
   interpolateCoordinate,
   interpolateLength,
 } from 'lib/interpolation';
-import { ReactiveValue, ensureReactive } from 'lib/reactive-values';
+import {
+  ReactiveValue,
+  ensureReactive,
+  positionToCoordinates,
+} from 'lib/reactive-values';
 import { Context, RequestFunction } from 'lib/request-functions';
 
 export type CircleShapeTransition = {
@@ -50,7 +54,7 @@ export class CircleShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -90,7 +94,7 @@ export class CircleShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -115,6 +119,41 @@ export class CircleShapeTransitionBuilder {
   }
 
   /**
+   * Transitions the center of the currently selected circles.
+   * @param center - The center position to transition to.
+   * @param easing - The easing function to use.
+   * @param interpolation - The interpolation function to use.
+   * @returns The current CircleShapeBuilder instance.
+   */
+  public center(
+    center:
+      | RequestFunction<Position | undefined>
+      | ReactiveValue<Position | undefined>
+      | Position
+      | undefined,
+    {
+      easing = easeInOutCubic,
+      interpolation = interpolateCoordinate,
+    }: {
+      easing?: Easing;
+      interpolation?: Interpolation<Coordinate | undefined>;
+    } = {},
+  ): CircleShapeTransitionBuilder {
+    if (typeof center === 'function') {
+      center = center(this._context);
+    }
+
+    center = ensureReactive(center);
+
+    const { x, y } = positionToCoordinates(center);
+
+    this.centerX(x, { easing, interpolation });
+    this.centerY(y, { easing, interpolation });
+
+    return this;
+  }
+
+  /**
    * Transitions the radius of the currently selected circles.
    * @param radius - The radius to transition to.
    * @param easing - The easing function to use.
@@ -130,7 +169,7 @@ export class CircleShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateLength,
     }: {
       easing?: Easing;

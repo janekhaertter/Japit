@@ -1,6 +1,6 @@
 import { TransitionMap } from 'lib/animation';
 import { Coordinate } from 'lib/data-types';
-import { Easing, easeInOutQubic } from 'lib/easing';
+import { Easing, easeInOutCubic } from 'lib/easing';
 import { Interpolation, interpolateCoordinate } from 'lib/interpolation';
 import { ReactiveValue, ensureReactive } from 'lib/reactive-values';
 
@@ -62,7 +62,7 @@ export class LineShapeBuilder {
   public x1(
     x1: ReactiveValue<Coordinate | undefined> | Coordinate | undefined | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -101,7 +101,7 @@ export class LineShapeBuilder {
   public x2(
     x2: ReactiveValue<Coordinate | undefined> | Coordinate | undefined | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -140,7 +140,7 @@ export class LineShapeBuilder {
   public y1(
     y1: ReactiveValue<Coordinate | undefined> | Coordinate | undefined | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -179,7 +179,7 @@ export class LineShapeBuilder {
   public y2(
     y2: ReactiveValue<Coordinate | undefined> | Coordinate | undefined | number,
     {
-      easing = easeInOutQubic,
+      easing = easeInOutCubic,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
