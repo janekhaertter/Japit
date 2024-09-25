@@ -5,6 +5,7 @@ import {
   Cursor,
   Delta,
   Length,
+  Position,
   StrokeDasharray,
   StrokeLinecap,
   StrokeLinejoin,
@@ -14,6 +15,7 @@ import {
   PrimitiveReactiveValue,
   ReactiveValue,
   SimpleWrappedReactiveValue,
+  coordinatesToPosition,
   ensureReactive,
 } from 'lib/reactive-values';
 
@@ -88,6 +90,8 @@ export class GeometryElement {
     new SimpleWrappedReactiveValue(ensureReactive(undefined));
   private _centerY: SimpleWrappedReactiveValue<Coordinate | undefined> =
     new SimpleWrappedReactiveValue(ensureReactive(undefined));
+  private _radius: SimpleWrappedReactiveValue<Length | undefined> =
+    new SimpleWrappedReactiveValue(ensureReactive(undefined));
 
   constructor() {
     this.setupStyle(this.fill, 'fill');
@@ -107,6 +111,7 @@ export class GeometryElement {
     this.shape.subscribe((shape) => {
       this._centerX.wrap(shape.getCenterX());
       this._centerY.wrap(shape.getCenterY());
+      this._radius.wrap(shape.getRadius());
     });
   }
 
@@ -150,5 +155,13 @@ export class GeometryElement {
 
   public getCenterY(): ReactiveValue<Coordinate | undefined> {
     return this._centerY;
+  }
+
+  public getCenter(): ReactiveValue<Position | undefined> {
+    return coordinatesToPosition(this._centerX, this._centerY);
+  }
+
+  public getRadius(): ReactiveValue<Length | undefined> {
+    return this._radius;
   }
 }

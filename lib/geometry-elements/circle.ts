@@ -73,4 +73,8 @@ export class Circle extends Shape {
   public getCenterY(): ReactiveValue<Coordinate | undefined> {
     return this.cy;
   }
+
+  public getRadius(): ReactiveValue<Length | undefined> {
+    return this.r;
+  }
 }

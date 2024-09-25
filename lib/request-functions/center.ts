@@ -1,10 +1,10 @@
 import { Identifier } from 'lib/animation';
-import { Coordinate } from 'lib/data-types';
+import { Coordinate, Position } from 'lib/data-types';
 import { GeometryElement } from 'lib/geometry-elements';
 
 import { RequestFunction } from './request-function';
 
-export function centerX(
+export function $centerX(
   id: Identifier | GeometryElement,
 ): RequestFunction<Coordinate | undefined> {
   return ({ geometryElementManager }) => {
@@ -12,10 +12,18 @@ export function centerX(
   };
 }
 
-export function centerY(
+export function $centerY(
   id: Identifier | GeometryElement,
 ): RequestFunction<Coordinate | undefined> {
   return ({ geometryElementManager }) => {
     return geometryElementManager.requestGeometryElements(id)[0].getCenterY();
+  };
+}
+
+export function $center(
+  id: Identifier | GeometryElement,
+): RequestFunction<Position | undefined> {
+  return ({ geometryElementManager }) => {
+    return geometryElementManager.requestGeometryElements(id)[0].getCenter();
   };
 }

@@ -1,6 +1,3 @@
-import { Coordinate } from 'lib/data-types';
-import { ReactiveValue, ensureReactive } from 'lib/reactive-values';
-
 import { Shape } from './shape';
 import { svgNamespace } from './svg-namespace';
 
@@ -20,13 +17,5 @@ export class EmptyShape extends Shape {
 
   public getDomElement(): SVGElement {
     return this._domElement;
-  }
-
-  public getCenterX(): ReactiveValue<Coordinate | undefined> {
-    return ensureReactive(undefined);
-  }
-
-  public getCenterY(): ReactiveValue<Coordinate | undefined> {
-    return ensureReactive(undefined);
   }
 }
