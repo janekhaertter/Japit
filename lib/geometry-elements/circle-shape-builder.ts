@@ -84,6 +84,7 @@ export class CircleShapeTransitionBuilder {
    */
   public centerY(
     centerY:
+      | RequestFunction<Coordinate | undefined>
       | ReactiveValue<Coordinate | undefined>
       | Coordinate
       | undefined
@@ -96,7 +97,9 @@ export class CircleShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): CircleShapeTransitionBuilder {
-    if (typeof centerY === 'number') {
+    if (typeof centerY === 'function') {
+      centerY = centerY(this._context);
+    } else if (typeof centerY === 'number') {
       centerY = new Coordinate(centerY);
     }
 
@@ -120,7 +123,12 @@ export class CircleShapeTransitionBuilder {
    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/r
    */
   public radius(
-    radius: ReactiveValue<Length | undefined> | Length | undefined | number,
+    radius:
+      | RequestFunction<Length | undefined>
+      | ReactiveValue<Length | undefined>
+      | Length
+      | undefined
+      | number,
     {
       easing = easeInOutQubic,
       interpolation = interpolateLength,
@@ -129,7 +137,9 @@ export class CircleShapeTransitionBuilder {
       interpolation?: Interpolation<Length | undefined>;
     } = {},
   ): CircleShapeTransitionBuilder {
-    if (typeof radius === 'number') {
+    if (typeof radius === 'function') {
+      radius = radius(this._context);
+    } else if (typeof radius === 'number') {
       radius = new Length(radius);
     }
 
