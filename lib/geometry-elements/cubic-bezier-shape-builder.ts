@@ -3,6 +3,7 @@ import { Coordinate } from 'lib/data-types';
 import { Easing, easeInOutQubic } from 'lib/easing';
 import { Interpolation, interpolateCoordinate } from 'lib/interpolation';
 import { ReactiveValue, ensureReactive } from 'lib/reactive-values';
+import { Context, RequestFunction } from 'lib/request-functions';
 
 export type CubicBezierShapeTransition = {
   startX?: Transition<Coordinate | undefined>;
@@ -16,6 +17,8 @@ export type CubicBezierShapeTransition = {
 };
 
 export class CubicBezierShapeTransitionBuilder {
+  private _context: Context;
+
   private _startX?: Transition<Coordinate | undefined>;
   private _startY?: Transition<Coordinate | undefined>;
   private _control1X?: Transition<Coordinate | undefined>;
@@ -24,6 +27,10 @@ export class CubicBezierShapeTransitionBuilder {
   private _control2Y?: Transition<Coordinate | undefined>;
   private _endX?: Transition<Coordinate | undefined>;
   private _endY?: Transition<Coordinate | undefined>;
+
+  constructor({ context }: { context: Context }) {
+    this._context = context;
+  }
 
   public build(): CubicBezierShapeTransition {
     return {
@@ -48,6 +55,7 @@ export class CubicBezierShapeTransitionBuilder {
    */
   public startX(
     startX:
+      | RequestFunction<Coordinate | undefined>
       | ReactiveValue<Coordinate | undefined>
       | Coordinate
       | undefined
@@ -60,7 +68,9 @@ export class CubicBezierShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): CubicBezierShapeTransitionBuilder {
-    if (typeof startX === 'number') {
+    if (typeof startX === 'function') {
+      startX = startX(this._context);
+    } else if (typeof startX === 'number') {
       startX = new Coordinate(startX);
     }
 
@@ -85,6 +95,7 @@ export class CubicBezierShapeTransitionBuilder {
    */
   public startY(
     startY:
+      | RequestFunction<Coordinate | undefined>
       | ReactiveValue<Coordinate | undefined>
       | Coordinate
       | undefined
@@ -97,7 +108,9 @@ export class CubicBezierShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): CubicBezierShapeTransitionBuilder {
-    if (typeof startY === 'number') {
+    if (typeof startY === 'function') {
+      startY = startY(this._context);
+    } else if (typeof startY === 'number') {
       startY = new Coordinate(startY);
     }
 
@@ -122,6 +135,7 @@ export class CubicBezierShapeTransitionBuilder {
    */
   public control1X(
     control1X:
+      | RequestFunction<Coordinate | undefined>
       | ReactiveValue<Coordinate | undefined>
       | Coordinate
       | undefined
@@ -134,7 +148,9 @@ export class CubicBezierShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): CubicBezierShapeTransitionBuilder {
-    if (typeof control1X === 'number') {
+    if (typeof control1X === 'function') {
+      control1X = control1X(this._context);
+    } else if (typeof control1X === 'number') {
       control1X = new Coordinate(control1X);
     }
 
@@ -159,6 +175,7 @@ export class CubicBezierShapeTransitionBuilder {
    */
   public control1Y(
     control1Y:
+      | RequestFunction<Coordinate | undefined>
       | ReactiveValue<Coordinate | undefined>
       | Coordinate
       | undefined
@@ -171,7 +188,9 @@ export class CubicBezierShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): CubicBezierShapeTransitionBuilder {
-    if (typeof control1Y === 'number') {
+    if (typeof control1Y === 'function') {
+      control1Y = control1Y(this._context);
+    } else if (typeof control1Y === 'number') {
       control1Y = new Coordinate(control1Y);
     }
 
@@ -196,6 +215,7 @@ export class CubicBezierShapeTransitionBuilder {
    */
   public control2X(
     control2X:
+      | RequestFunction<Coordinate | undefined>
       | ReactiveValue<Coordinate | undefined>
       | Coordinate
       | undefined
@@ -208,7 +228,9 @@ export class CubicBezierShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): CubicBezierShapeTransitionBuilder {
-    if (typeof control2X === 'number') {
+    if (typeof control2X === 'function') {
+      control2X = control2X(this._context);
+    } else if (typeof control2X === 'number') {
       control2X = new Coordinate(control2X);
     }
 
@@ -233,6 +255,7 @@ export class CubicBezierShapeTransitionBuilder {
    */
   public control2Y(
     control2Y:
+      | RequestFunction<Coordinate | undefined>
       | ReactiveValue<Coordinate | undefined>
       | Coordinate
       | undefined
@@ -245,7 +268,9 @@ export class CubicBezierShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): CubicBezierShapeTransitionBuilder {
-    if (typeof control2Y === 'number') {
+    if (typeof control2Y === 'function') {
+      control2Y = control2Y(this._context);
+    } else if (typeof control2Y === 'number') {
       control2Y = new Coordinate(control2Y);
     }
 
@@ -270,6 +295,7 @@ export class CubicBezierShapeTransitionBuilder {
    */
   public endX(
     endX:
+      | RequestFunction<Coordinate | undefined>
       | ReactiveValue<Coordinate | undefined>
       | Coordinate
       | undefined
@@ -282,7 +308,9 @@ export class CubicBezierShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): CubicBezierShapeTransitionBuilder {
-    if (typeof endX === 'number') {
+    if (typeof endX === 'function') {
+      endX = endX(this._context);
+    } else if (typeof endX === 'number') {
       endX = new Coordinate(endX);
     }
 
@@ -307,6 +335,7 @@ export class CubicBezierShapeTransitionBuilder {
    */
   public endY(
     endY:
+      | RequestFunction<Coordinate | undefined>
       | ReactiveValue<Coordinate | undefined>
       | Coordinate
       | undefined
@@ -319,7 +348,9 @@ export class CubicBezierShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): CubicBezierShapeTransitionBuilder {
-    if (typeof endY === 'number') {
+    if (typeof endY === 'function') {
+      endY = endY(this._context);
+    } else if (typeof endY === 'number') {
       endY = new Coordinate(endY);
     }
 

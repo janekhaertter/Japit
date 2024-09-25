@@ -761,7 +761,9 @@ export class TransitionBuilder {
       easing?: Easing;
     } = {},
   ): TransitionBuilder {
-    const cubicBezierShapeBuilder = new CubicBezierShapeTransitionBuilder();
+    const cubicBezierShapeBuilder = new CubicBezierShapeTransitionBuilder({
+      context: this._context,
+    });
 
     if (cubicBezierShape) {
       cubicBezierShape(cubicBezierShapeBuilder);
