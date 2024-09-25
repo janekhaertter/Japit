@@ -11,7 +11,6 @@ import {
 } from 'lib/data-types';
 import { Easing, easeInOutQubic, easeLinear } from 'lib/easing';
 import {
-  Circle,
   CircleShapeTransitionBuilder,
   EmptyShape,
   GeometryElement,
@@ -676,8 +675,8 @@ export class TransitionBuilder {
       this._context.updatedValues.set(
         e.shape,
         interpolateToCircle(shape)(
-          e.shape,
-          e.shape,
+          e.shape.unwrap(),
+          ensureReactive(new EmptyShape()),
           easing(this._context.progress),
         ),
       );
@@ -708,8 +707,8 @@ export class TransitionBuilder {
       this._context.updatedValues.set(
         e.shape,
         interpolateToRectangle(shape)(
-          e.shape,
-          e.shape,
+          e.shape.unwrap(),
+          ensureReactive(new EmptyShape()),
           easing(this._context.progress),
         ),
       );
@@ -740,8 +739,8 @@ export class TransitionBuilder {
       this._context.updatedValues.set(
         e.shape,
         interpolateToLine(shape)(
-          e.shape,
-          e.shape,
+          e.shape.unwrap(),
+          ensureReactive(new EmptyShape()),
           easing(this._context.progress),
         ),
       );
@@ -772,8 +771,8 @@ export class TransitionBuilder {
       this._context.updatedValues.set(
         e.shape,
         interpolateToCubicBezier(shape)(
-          e.shape,
-          e.shape,
+          e.shape.unwrap(),
+          ensureReactive(new EmptyShape()),
           easing(this._context.progress),
         ),
       );

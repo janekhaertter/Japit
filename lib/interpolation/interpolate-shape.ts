@@ -11,7 +11,6 @@ import {
 import { CubicBezier } from 'lib/geometry-elements/cubic-bezier';
 import { CubicBezierShapeTransition } from 'lib/geometry-elements/cubic-bezier-shape-builder';
 import { FunctionalReactiveValue } from 'lib/reactive-values';
-import { RequestFunction } from 'lib/request-functions';
 
 import { Interpolation } from './interpolation';
 

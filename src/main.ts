@@ -1,4 +1,4 @@
-import { AnimationBuilder, createAnimation } from 'lib';
+import { createAnimation } from 'lib';
 
 const svg: SVGSVGElement = document.querySelector('svg')!;
 
@@ -38,12 +38,7 @@ const player = createAnimation(svg, [
 
     b.select(4)
       .fill('orange')
-      .circle((r) =>
-        r
-          .centerX(b.getElement(3).getCenterX())
-          .centerY(b.getElement(3).getCenterY())
-          .radius(10),
-      );
+      .circle((r) => r.radius(10));
   },
   (b) => {
     b.duration(0.8);

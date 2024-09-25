@@ -9,8 +9,6 @@ import {
 import { ReactiveValue, ensureReactive } from 'lib/reactive-values';
 import { Context, RequestFunction } from 'lib/request-functions';
 
-import { GeometryElement } from './geometry-element';
-
 export type CircleShapeTransition = {
   centerX: Transition<Coordinate | undefined> | undefined;
   centerY: Transition<Coordinate | undefined> | undefined;
