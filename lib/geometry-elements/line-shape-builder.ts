@@ -3,6 +3,7 @@ import { Coordinate } from 'lib/data-types';
 import { Easing, easeInOutQubic } from 'lib/easing';
 import { Interpolation, interpolateCoordinate } from 'lib/interpolation';
 import { ReactiveValue, ensureReactive } from 'lib/reactive-values';
+import { Context, RequestFunction } from 'lib/request-functions';
 
 export type LineShapeTransition = {
   startX: Transition<Coordinate | undefined> | undefined;
@@ -12,10 +13,16 @@ export type LineShapeTransition = {
 };
 
 export class LineShapeTransitionBuilder {
+  private _context: Context;
+
   private _startX?: Transition<Coordinate | undefined>;
   private _startY?: Transition<Coordinate | undefined>;
   private _endX?: Transition<Coordinate | undefined>;
   private _endY?: Transition<Coordinate | undefined>;
+
+  constructor({ context }: { context: Context }) {
+    this._context = context;
+  }
 
   public build(): LineShapeTransition {
     return {
@@ -36,6 +43,7 @@ export class LineShapeTransitionBuilder {
    */
   public startX(
     startX:
+      | RequestFunction<Coordinate | undefined>
       | ReactiveValue<Coordinate | undefined>
       | Coordinate
       | undefined
@@ -48,7 +56,9 @@ export class LineShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): LineShapeTransitionBuilder {
-    if (typeof startX === 'number') {
+    if (typeof startX === 'function') {
+      startX = startX(this._context);
+    } else if (typeof startX === 'number') {
       startX = new Coordinate(startX);
     }
 
@@ -73,6 +83,7 @@ export class LineShapeTransitionBuilder {
    */
   public startY(
     startY:
+      | RequestFunction<Coordinate | undefined>
       | ReactiveValue<Coordinate | undefined>
       | Coordinate
       | undefined
@@ -85,7 +96,9 @@ export class LineShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): LineShapeTransitionBuilder {
-    if (typeof startY === 'number') {
+    if (typeof startY === 'function') {
+      startY = startY(this._context);
+    } else if (typeof startY === 'number') {
       startY = new Coordinate(startY);
     }
 
@@ -110,6 +123,7 @@ export class LineShapeTransitionBuilder {
    */
   public endX(
     endX:
+      | RequestFunction<Coordinate | undefined>
       | ReactiveValue<Coordinate | undefined>
       | Coordinate
       | undefined
@@ -122,7 +136,9 @@ export class LineShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): LineShapeTransitionBuilder {
-    if (typeof endX === 'number') {
+    if (typeof endX === 'function') {
+      endX = endX(this._context);
+    } else if (typeof endX === 'number') {
       endX = new Coordinate(endX);
     }
 
@@ -147,6 +163,7 @@ export class LineShapeTransitionBuilder {
    */
   public endY(
     endY:
+      | RequestFunction<Coordinate | undefined>
       | ReactiveValue<Coordinate | undefined>
       | Coordinate
       | undefined
@@ -159,7 +176,9 @@ export class LineShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): LineShapeTransitionBuilder {
-    if (typeof endY === 'number') {
+    if (typeof endY === 'function') {
+      endY = endY(this._context);
+    } else if (typeof endY === 'number') {
       endY = new Coordinate(endY);
     }
 

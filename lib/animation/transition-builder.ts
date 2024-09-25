@@ -727,7 +727,9 @@ export class TransitionBuilder {
       easing?: Easing;
     } = {},
   ): TransitionBuilder {
-    const lineShapeBuilder = new LineShapeTransitionBuilder();
+    const lineShapeBuilder = new LineShapeTransitionBuilder({
+      context: this._context,
+    });
 
     if (lineShape) {
       lineShape(lineShapeBuilder);
