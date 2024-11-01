@@ -1,6 +1,6 @@
 import { Transition } from 'lib/animation';
 import { Coordinate, Position } from 'lib/data-types';
-import { Easing, easeInOutCubic } from 'lib/easing';
+import { Easing, easeJumpToEnd } from 'lib/easing';
 import { Interpolation, interpolateCoordinate } from 'lib/interpolation';
 import {
   ReactiveValue,
@@ -8,6 +8,9 @@ import {
   positionToCoordinates,
 } from 'lib/reactive-values';
 import { Context, RequestFunction } from 'lib/request-functions';
+
+import { GeometryElement } from './geometry-element';
+import { Line } from './line';
 
 export type LineShapeTransition = {
   startX: Transition<Coordinate | undefined> | undefined;
@@ -18,23 +21,36 @@ export type LineShapeTransition = {
 
 export class LineShapeTransitionBuilder {
   private _context: Context;
+  private _elements: GeometryElement[];
+  private _updatedShapes: Map<GeometryElement, Line>;
 
-  private _startX?: Transition<Coordinate | undefined>;
-  private _startY?: Transition<Coordinate | undefined>;
-  private _endX?: Transition<Coordinate | undefined>;
-  private _endY?: Transition<Coordinate | undefined>;
-
-  constructor({ context }: { context: Context }) {
+  constructor({
+    context,
+    elements,
+    updatedShapes,
+  }: {
+    context: Context;
+    elements: GeometryElement[];
+    updatedShapes: Map<GeometryElement, Line>;
+  }) {
     this._context = context;
-  }
+    this._elements = elements;
+    this._updatedShapes = updatedShapes;
 
-  public build(): LineShapeTransition {
-    return {
-      startX: this._startX,
-      startY: this._startY,
-      endX: this._endX,
-      endY: this._endY,
-    };
+    this._elements.forEach((element) => {
+      const startX = element.getStartX().unwrap();
+      const startY = element.getStartY().unwrap();
+      const endX = element.getEndX().unwrap();
+      const endY = element.getEndY().unwrap();
+
+      const line = new Line();
+      line.x1.wrap(startX);
+      line.y1.wrap(startY);
+      line.x2.wrap(endX);
+      line.y2.wrap(endY);
+
+      this._updatedShapes.set(element, line);
+    });
   }
 
   /**
@@ -53,7 +69,7 @@ export class LineShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -68,12 +84,13 @@ export class LineShapeTransitionBuilder {
 
     startX = ensureReactive(startX);
 
-    this._startX = {
-      to: startX,
-      easing,
-      interpolation,
-    };
+    const progress = easing(this._context.progress);
 
+    this._elements.forEach((element) => {
+      this._updatedShapes
+        .get(element)!
+        .x1.wrap(interpolation(element.getStartX().unwrap(), startX, progress));
+    });
     return this;
   }
 
@@ -93,7 +110,7 @@ export class LineShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -108,11 +125,13 @@ export class LineShapeTransitionBuilder {
 
     startY = ensureReactive(startY);
 
-    this._startY = {
-      to: startY,
-      easing,
-      interpolation,
-    };
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      this._updatedShapes
+        .get(element)!
+        .y1.wrap(interpolation(element.getStartY().unwrap(), startY, progress));
+    });
 
     return this;
   }
@@ -131,7 +150,7 @@ export class LineShapeTransitionBuilder {
       | Position
       | undefined,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -168,7 +187,7 @@ export class LineShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -183,11 +202,13 @@ export class LineShapeTransitionBuilder {
 
     endX = ensureReactive(endX);
 
-    this._endX = {
-      to: endX,
-      easing,
-      interpolation,
-    };
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      this._updatedShapes
+        .get(element)!
+        .x2.wrap(interpolation(element.getEndX().unwrap(), endX, progress));
+    });
 
     return this;
   }
@@ -208,7 +229,7 @@ export class LineShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -223,11 +244,13 @@ export class LineShapeTransitionBuilder {
 
     endY = ensureReactive(endY);
 
-    this._endY = {
-      to: endY,
-      easing,
-      interpolation,
-    };
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      this._updatedShapes
+        .get(element)!
+        .y2.wrap(interpolation(element.getEndY().unwrap(), endY, progress));
+    });
 
     return this;
   }
@@ -246,7 +269,7 @@ export class LineShapeTransitionBuilder {
       | Position
       | undefined,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;

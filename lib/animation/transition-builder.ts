@@ -11,12 +11,15 @@ import {
 } from 'lib/data-types';
 import { Easing, easeInOutCubic, easeLinear } from 'lib/easing';
 import {
+  Circle,
   CircleShapeTransitionBuilder,
-  EmptyShape,
   GeometryElement,
+  Line,
   LineShapeTransitionBuilder,
   RectangleShapeBuilder as RectangleShapeTransitionBuilder,
+  Shape,
 } from 'lib/geometry-elements';
+import { CubicBezier } from 'lib/geometry-elements/cubic-bezier';
 import { CubicBezierShapeTransitionBuilder } from 'lib/geometry-elements/cubic-bezier-shape-builder';
 import {
   Interpolation,
@@ -26,10 +29,7 @@ import {
   interpolateDiscrete,
   interpolateLength,
   interpolateNumber,
-  interpolateToCircle,
-  interpolateToCubicBezier,
-  interpolateToLine,
-  interpolateToRectangle,
+  interpolateToShape,
 } from 'lib/interpolation';
 import { ReactiveValue, ensureReactive } from 'lib/reactive-values';
 import { Context, RequestFunction } from 'lib/request-functions';
@@ -651,33 +651,67 @@ export class TransitionBuilder {
     return this;
   }
 
+  public shape(
+    shape:
+      | RequestFunction<Shape | undefined>
+      | ReactiveValue<Shape | undefined>
+      | Shape
+      | undefined,
+    {
+      easing = easeInOutCubic,
+    }: {
+      easing?: Easing;
+    } = {},
+  ): TransitionBuilder {
+    if (typeof shape === 'function') {
+      shape = shape(this._context);
+    }
+
+    shape = ensureReactive(shape);
+
+    const interpolator = interpolateToShape(shape);
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((e) => {
+      this._context.updatedValues.set(
+        e.shape,
+        interpolator(e.shape.unwrap(), progress),
+      );
+    });
+
+    return this;
+  }
+
   public circle(
     circleShape?: (
       circleShapeTransitionBuilder: CircleShapeTransitionBuilder,
     ) => void,
     {
-      easing = easeLinear,
+      easing = easeInOutCubic,
     }: {
       easing?: Easing;
     } = {},
   ): TransitionBuilder {
+    const updatedShapes = new Map<GeometryElement, Circle>();
+
     const circleShapeBuilder = new CircleShapeTransitionBuilder({
       context: this._context,
+      elements: this._elements,
+      updatedShapes,
     });
 
     if (circleShape) {
       circleShape(circleShapeBuilder);
     }
 
-    const shape = circleShapeBuilder.build();
+    const progress = easing(this._context.progress);
 
-    this._elements.forEach((e) => {
+    updatedShapes.forEach((circle, element) => {
       this._context.updatedValues.set(
-        e.shape,
-        interpolateToCircle(shape)(
-          e.shape.unwrap(),
-          ensureReactive(new EmptyShape()),
-          easing(this._context.progress),
+        element.shape,
+        interpolateToShape(ensureReactive(circle))(
+          element.shape.unwrap(),
+          progress,
         ),
       );
     });
@@ -695,21 +729,26 @@ export class TransitionBuilder {
       easing?: Easing;
     } = {},
   ): TransitionBuilder {
-    const rectangleShapeBuilder = new RectangleShapeTransitionBuilder();
+    const updatedShapes = new Map<GeometryElement, Rectangle>();
+
+    const rectangleShapeBuilder = new RectangleShapeTransitionBuilder({
+      context: this._context,
+      elements: this._elements,
+      updatedShapes,
+    });
 
     if (rectangleShape) {
       rectangleShape(rectangleShapeBuilder);
     }
 
-    const shape = rectangleShapeBuilder.build();
+    const progress = easing(this._context.progress);
 
-    this._elements.forEach((e) => {
+    updatedShapes.forEach((rectangle, element) => {
       this._context.updatedValues.set(
-        e.shape,
-        interpolateToRectangle(shape)(
-          e.shape.unwrap(),
-          ensureReactive(new EmptyShape()),
-          easing(this._context.progress),
+        element.shape,
+        interpolateToShape(ensureReactive(rectangle))(
+          element.shape.unwrap(),
+          progress,
         ),
       );
     });
@@ -727,23 +766,26 @@ export class TransitionBuilder {
       easing?: Easing;
     } = {},
   ): TransitionBuilder {
+    const updatedShapes = new Map<GeometryElement, Line>();
+
     const lineShapeBuilder = new LineShapeTransitionBuilder({
       context: this._context,
+      elements: this._elements,
+      updatedShapes,
     });
 
     if (lineShape) {
       lineShape(lineShapeBuilder);
     }
 
-    const shape = lineShapeBuilder.build();
+    const progress = easing(this._context.progress);
 
-    this._elements.forEach((e) => {
+    updatedShapes.forEach((line, element) => {
       this._context.updatedValues.set(
-        e.shape,
-        interpolateToLine(shape)(
-          e.shape.unwrap(),
-          ensureReactive(new EmptyShape()),
-          easing(this._context.progress),
+        element.shape,
+        interpolateToShape(ensureReactive(line))(
+          element.shape.unwrap(),
+          progress,
         ),
       );
     });
@@ -761,23 +803,26 @@ export class TransitionBuilder {
       easing?: Easing;
     } = {},
   ): TransitionBuilder {
+    const updatedShapes = new Map<GeometryElement, CubicBezier>();
+
     const cubicBezierShapeBuilder = new CubicBezierShapeTransitionBuilder({
       context: this._context,
+      elements: this._elements,
+      updatedShapes,
     });
 
     if (cubicBezierShape) {
       cubicBezierShape(cubicBezierShapeBuilder);
     }
 
-    const shape = cubicBezierShapeBuilder.build();
+    const progress = easing(this._context.progress);
 
-    this._elements.forEach((e) => {
+    updatedShapes.forEach((cubicBezier, element) => {
       this._context.updatedValues.set(
-        e.shape,
-        interpolateToCubicBezier(shape)(
-          e.shape.unwrap(),
-          ensureReactive(new EmptyShape()),
-          easing(this._context.progress),
+        element.shape,
+        interpolateToShape(ensureReactive(cubicBezier))(
+          element.shape.unwrap(),
+          progress,
         ),
       );
     });

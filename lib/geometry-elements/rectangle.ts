@@ -60,11 +60,11 @@ export class Rectangle extends Shape {
       const xValue = x.getValue()?.getNumber();
       const widthValue = width.getValue()?.getNumber();
 
-      if (xValue === undefined || widthValue === undefined) {
+      if (xValue === undefined) {
         return undefined;
       }
 
-      return new Coordinate(xValue + widthValue / 2);
+      return new Coordinate(xValue + (widthValue ?? 0) / 2);
     });
   }
 
@@ -73,11 +73,52 @@ export class Rectangle extends Shape {
       const yValue = y.getValue()?.getNumber();
       const heightValue = height.getValue()?.getNumber();
 
-      if (yValue === undefined || heightValue === undefined) {
+      if (yValue === undefined) {
         return undefined;
       }
 
-      return new Coordinate(yValue + heightValue / 2);
+      return new Coordinate(yValue + (heightValue ?? 0) / 2);
     });
+  }
+
+  public toRectangle(): Rectangle | undefined {
+    return this;
+  }
+
+  public getRadius(): ReactiveValue<Length | undefined> {
+    return new FunctionalReactiveValue([this.width, this.height], () => {
+      const rxValue = this.width.getValue();
+      const ryValue = this.height.getValue();
+
+      if (rxValue === undefined || ryValue === undefined) {
+        return undefined;
+      }
+
+      return new Length((rxValue.getNumber() + ryValue.getNumber()) / 4);
+    });
+  }
+
+  public getRadiusX(): ReactiveValue<Length | undefined> {
+    return this.rx;
+  }
+
+  public getRadiusY(): ReactiveValue<Length | undefined> {
+    return this.ry;
+  }
+
+  public getTopLeftX(): ReactiveValue<Coordinate | undefined> {
+    return this.x;
+  }
+
+  public getTopLeftY(): ReactiveValue<Coordinate | undefined> {
+    return this.y;
+  }
+
+  public getHeight(): ReactiveValue<Length | undefined> {
+    return this.height;
+  }
+
+  public getWidth(): ReactiveValue<Length | undefined> {
+    return this.width;
   }
 }

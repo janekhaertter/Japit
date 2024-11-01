@@ -1,6 +1,5 @@
-import { Transition } from 'lib/animation';
 import { Coordinate, Length, Position } from 'lib/data-types';
-import { Easing, easeInOutCubic } from 'lib/easing';
+import { Easing, easeJumpToEnd } from 'lib/easing';
 import {
   Interpolation,
   interpolateCoordinate,
@@ -13,29 +12,39 @@ import {
 } from 'lib/reactive-values';
 import { Context, RequestFunction } from 'lib/request-functions';
 
-export type CircleShapeTransition = {
-  centerX: Transition<Coordinate | undefined> | undefined;
-  centerY: Transition<Coordinate | undefined> | undefined;
-  radius: Transition<Length | undefined> | undefined;
-};
+import { Circle } from './circle';
+import { GeometryElement } from './geometry-element';
 
 export class CircleShapeTransitionBuilder {
   private _context: Context;
+  private _elements: GeometryElement[];
+  private _updatedShapes: Map<GeometryElement, Circle>;
 
-  private _centerX?: Transition<Coordinate | undefined>;
-  private _centerY?: Transition<Coordinate | undefined>;
-  private _radius?: Transition<Length | undefined>;
-
-  constructor({ context }: { context: Context }) {
+  constructor({
+    context,
+    elements,
+    updatedShapes,
+  }: {
+    context: Context;
+    elements: GeometryElement[];
+    updatedShapes: Map<GeometryElement, Circle>;
+  }) {
     this._context = context;
-  }
+    this._elements = elements;
+    this._updatedShapes = updatedShapes;
 
-  public build(): CircleShapeTransition {
-    return {
-      centerX: this._centerX,
-      centerY: this._centerY,
-      radius: this._radius,
-    };
+    this._elements.forEach((element) => {
+      const cx = element.getCenterX().unwrap();
+      const cy = element.getCenterY().unwrap();
+      const r = element.getRadius().unwrap();
+
+      const circle = new Circle();
+      circle.cx.wrap(cx);
+      circle.cy.wrap(cy);
+      circle.r.wrap(r);
+
+      this._updatedShapes.set(element, circle);
+    });
   }
 
   /**
@@ -54,7 +63,7 @@ export class CircleShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -69,11 +78,15 @@ export class CircleShapeTransitionBuilder {
 
     centerX = ensureReactive(centerX);
 
-    this._centerX = {
-      to: centerX,
-      easing,
-      interpolation,
-    };
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      this._updatedShapes
+        .get(element)!
+        .cx.wrap(
+          interpolation(element.getCenterX().unwrap(), centerX, progress),
+        );
+    });
 
     return this;
   }
@@ -94,7 +107,7 @@ export class CircleShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -109,11 +122,15 @@ export class CircleShapeTransitionBuilder {
 
     centerY = ensureReactive(centerY);
 
-    this._centerY = {
-      to: centerY,
-      easing,
-      interpolation,
-    };
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      this._updatedShapes
+        .get(element)!
+        .cy.wrap(
+          interpolation(element.getCenterY().unwrap(), centerY, progress),
+        );
+    });
 
     return this;
   }
@@ -132,7 +149,7 @@ export class CircleShapeTransitionBuilder {
       | Position
       | undefined,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -169,7 +186,7 @@ export class CircleShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateLength,
     }: {
       easing?: Easing;
@@ -184,11 +201,13 @@ export class CircleShapeTransitionBuilder {
 
     radius = ensureReactive(radius);
 
-    this._radius = {
-      to: radius,
-      easing,
-      interpolation,
-    };
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      this._updatedShapes
+        .get(element)!
+        .r.wrap(interpolation(element.getRadius().unwrap(), radius, progress));
+    });
 
     return this;
   }

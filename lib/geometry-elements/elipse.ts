@@ -1,5 +1,4 @@
 import { Coordinate, Length } from 'lib/data-types';
-import { Ellipsable } from 'lib/interpolation';
 import {
   FunctionalReactiveValue,
   ReactiveValue,
@@ -11,7 +10,7 @@ import { Rectangle } from './rectangle';
 import { Shape } from './shape';
 import { svgNamespace } from './svg-namespace';
 
-export class Ellipse extends Shape implements Ellipsable {
+export class Ellipse extends Shape {
   protected _domElement = document.createElementNS(
     svgNamespace,
     'circle',
@@ -130,5 +129,84 @@ export class Ellipse extends Shape implements Ellipsable {
     rectangle.ry.wrap(this.ry);
 
     return rectangle;
+  }
+
+  public getCenterX(): ReactiveValue<Coordinate | undefined> {
+    return this.cx;
+  }
+
+  public getCenterY(): ReactiveValue<Coordinate | undefined> {
+    return this.cy;
+  }
+
+  public getRadius(): ReactiveValue<Length | undefined> {
+    return new FunctionalReactiveValue([this.rx, this.ry], () => {
+      const rxValue = this.rx.getValue();
+      const ryValue = this.ry.getValue();
+
+      if (rxValue === undefined || ryValue === undefined) {
+        return undefined;
+      }
+
+      return new Length((rxValue.getNumber() + ryValue.getNumber()) / 2);
+    });
+  }
+
+  public getRadiusX(): ReactiveValue<Length | undefined> {
+    return this.rx;
+  }
+
+  public getRadiusY(): ReactiveValue<Length | undefined> {
+    return this.ry;
+  }
+
+  public getTopLeftX(): ReactiveValue<Coordinate | undefined> {
+    return new FunctionalReactiveValue([this.cx, this.rx], () => {
+      const cxValue = this.cx.getValue();
+      const rxValue = this.rx.getValue() ?? new Length(0);
+
+      if (cxValue === undefined) {
+        return undefined;
+      }
+
+      return new Coordinate(cxValue.getNumber() - rxValue.getNumber());
+    });
+  }
+
+  public getTopLeftY(): ReactiveValue<Coordinate | undefined> {
+    return new FunctionalReactiveValue([this.cy, this.ry], () => {
+      const cyValue = this.cy.getValue();
+      const ryValue = this.ry.getValue() ?? new Length(0);
+
+      if (cyValue === undefined) {
+        return undefined;
+      }
+
+      return new Coordinate(cyValue.getNumber() - ryValue.getNumber());
+    });
+  }
+
+  public getWidth(): ReactiveValue<Length | undefined> {
+    return new FunctionalReactiveValue([this.rx], () => {
+      const rxValue = this.rx.getValue();
+
+      if (rxValue === undefined) {
+        return undefined;
+      }
+
+      return new Length(2 * rxValue.getNumber());
+    });
+  }
+
+  public getHeight(): ReactiveValue<Length | undefined> {
+    return new FunctionalReactiveValue([this.ry], () => {
+      const ryValue = this.ry.getValue();
+
+      if (ryValue === undefined) {
+        return undefined;
+      }
+
+      return new Length(2 * ryValue.getNumber());
+    });
   }
 }

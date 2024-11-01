@@ -19,6 +19,7 @@ export class Path extends Shape {
 
   constructor() {
     super();
+    this._domElement.setAttribute('pathLength', '1');
     this.pathData.subscribe((pathData) => {
       if (pathData === undefined) {
         this._domElement.removeAttribute('d');

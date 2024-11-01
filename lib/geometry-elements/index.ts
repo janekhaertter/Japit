@@ -2,6 +2,7 @@ export * from './geometry-element';
 export * from './shape';
 
 export * from './empty-shape';
+export * from './container-shape';
 
 export * from './circle';
 export * from './line';

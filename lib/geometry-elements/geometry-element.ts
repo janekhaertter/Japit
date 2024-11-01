@@ -92,6 +92,34 @@ export class GeometryElement {
     new SimpleWrappedReactiveValue(ensureReactive(undefined));
   private _radius: SimpleWrappedReactiveValue<Length | undefined> =
     new SimpleWrappedReactiveValue(ensureReactive(undefined));
+  private _topLeftX: SimpleWrappedReactiveValue<Coordinate | undefined> =
+    new SimpleWrappedReactiveValue(ensureReactive(undefined));
+  private _topLeftY: SimpleWrappedReactiveValue<Coordinate | undefined> =
+    new SimpleWrappedReactiveValue(ensureReactive(undefined));
+  private _width: SimpleWrappedReactiveValue<Length | undefined> =
+    new SimpleWrappedReactiveValue(ensureReactive(undefined));
+  private _height: SimpleWrappedReactiveValue<Length | undefined> =
+    new SimpleWrappedReactiveValue(ensureReactive(undefined));
+  private _radiusX: SimpleWrappedReactiveValue<Length | undefined> =
+    new SimpleWrappedReactiveValue(ensureReactive(undefined));
+  private _radiusY: SimpleWrappedReactiveValue<Length | undefined> =
+    new SimpleWrappedReactiveValue(ensureReactive(undefined));
+  private _startX: SimpleWrappedReactiveValue<Coordinate | undefined> =
+    new SimpleWrappedReactiveValue(ensureReactive(undefined));
+  private _startY: SimpleWrappedReactiveValue<Coordinate | undefined> =
+    new SimpleWrappedReactiveValue(ensureReactive(undefined));
+  private _endX: SimpleWrappedReactiveValue<Coordinate | undefined> =
+    new SimpleWrappedReactiveValue(ensureReactive(undefined));
+  private _endY: SimpleWrappedReactiveValue<Coordinate | undefined> =
+    new SimpleWrappedReactiveValue(ensureReactive(undefined));
+  private _control1X: SimpleWrappedReactiveValue<Coordinate | undefined> =
+    new SimpleWrappedReactiveValue(ensureReactive(undefined));
+  private _control1Y: SimpleWrappedReactiveValue<Coordinate | undefined> =
+    new SimpleWrappedReactiveValue(ensureReactive(undefined));
+  private _control2X: SimpleWrappedReactiveValue<Coordinate | undefined> =
+    new SimpleWrappedReactiveValue(ensureReactive(undefined));
+  private _control2Y: SimpleWrappedReactiveValue<Coordinate | undefined> =
+    new SimpleWrappedReactiveValue(ensureReactive(undefined));
 
   constructor() {
     this.setupStyle(this.fill, 'fill');
@@ -112,6 +140,20 @@ export class GeometryElement {
       this._centerX.wrap(shape.getCenterX());
       this._centerY.wrap(shape.getCenterY());
       this._radius.wrap(shape.getRadius());
+      this._topLeftX.wrap(shape.getTopLeftX());
+      this._topLeftY.wrap(shape.getTopLeftY());
+      this._width.wrap(shape.getWidth());
+      this._height.wrap(shape.getHeight());
+      this._radiusX.wrap(shape.getRadiusX());
+      this._radiusY.wrap(shape.getRadiusY());
+      this._startX.wrap(shape.getStartX());
+      this._startY.wrap(shape.getStartY());
+      this._endX.wrap(shape.getEndX());
+      this._endY.wrap(shape.getEndY());
+      this._control1X.wrap(shape.getControlX1());
+      this._control1Y.wrap(shape.getControlY1());
+      this._control2X.wrap(shape.getControlX2());
+      this._control2Y.wrap(shape.getControlY2());
     });
   }
 
@@ -149,11 +191,11 @@ export class GeometryElement {
     this._domElement.replaceChildren(this.shape.getValue().getDomElement());
   }
 
-  public getCenterX(): ReactiveValue<Coordinate | undefined> {
+  public getCenterX(): SimpleWrappedReactiveValue<Coordinate | undefined> {
     return this._centerX;
   }
 
-  public getCenterY(): ReactiveValue<Coordinate | undefined> {
+  public getCenterY(): SimpleWrappedReactiveValue<Coordinate | undefined> {
     return this._centerY;
   }
 
@@ -161,7 +203,63 @@ export class GeometryElement {
     return coordinatesToPosition(this._centerX, this._centerY);
   }
 
-  public getRadius(): ReactiveValue<Length | undefined> {
+  public getRadius(): SimpleWrappedReactiveValue<Length | undefined> {
     return this._radius;
+  }
+
+  public getTopLeftX(): SimpleWrappedReactiveValue<Coordinate | undefined> {
+    return this._topLeftX;
+  }
+
+  public getTopLeftY(): SimpleWrappedReactiveValue<Coordinate | undefined> {
+    return this._topLeftY;
+  }
+
+  public getWidth(): SimpleWrappedReactiveValue<Length | undefined> {
+    return this._width;
+  }
+
+  public getHeight(): SimpleWrappedReactiveValue<Length | undefined> {
+    return this._height;
+  }
+
+  public getRadiusX(): SimpleWrappedReactiveValue<Length | undefined> {
+    return this._radiusX;
+  }
+
+  public getRadiusY(): SimpleWrappedReactiveValue<Length | undefined> {
+    return this._radiusY;
+  }
+
+  public getStartX(): SimpleWrappedReactiveValue<Coordinate | undefined> {
+    return this._startX;
+  }
+
+  public getStartY(): SimpleWrappedReactiveValue<Coordinate | undefined> {
+    return this._startY;
+  }
+
+  public getEndX(): SimpleWrappedReactiveValue<Coordinate | undefined> {
+    return this._endX;
+  }
+
+  public getEndY(): SimpleWrappedReactiveValue<Coordinate | undefined> {
+    return this._endY;
+  }
+
+  public getControl1X(): SimpleWrappedReactiveValue<Coordinate | undefined> {
+    return this._control1X;
+  }
+
+  public getControl1Y(): SimpleWrappedReactiveValue<Coordinate | undefined> {
+    return this._control1Y;
+  }
+
+  public getControl2X(): SimpleWrappedReactiveValue<Coordinate | undefined> {
+    return this._control2X;
+  }
+
+  public getControl2Y(): SimpleWrappedReactiveValue<Coordinate | undefined> {
+    return this._control2Y;
   }
 }

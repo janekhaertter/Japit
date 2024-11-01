@@ -1,5 +1,6 @@
 import { Coordinate, Length } from 'lib/data-types';
 import {
+  FunctionalReactiveValue,
   ReactiveValue,
   SimpleWrappedReactiveValue,
   ensureReactive,
@@ -76,5 +77,61 @@ export class Circle extends Shape {
 
   public getRadius(): ReactiveValue<Length | undefined> {
     return this.r;
+  }
+
+  public getRadiusX(): ReactiveValue<Length | undefined> {
+    return this.r;
+  }
+
+  public getRadiusY(): ReactiveValue<Length | undefined> {
+    return this.r;
+  }
+
+  public getTopLeftX(): ReactiveValue<Coordinate | undefined> {
+    return new SimpleWrappedReactiveValue(
+      new FunctionalReactiveValue([this.cx, this.r], () => {
+        const cxValue = this.cx.getValue();
+        const rValue = this.r.getValue() ?? new Length(0);
+
+        if (cxValue === undefined) {
+          return undefined;
+        }
+
+        return new Coordinate(cxValue.getNumber() - rValue.getNumber());
+      }),
+    );
+  }
+
+  public getTopLeftY(): ReactiveValue<Coordinate | undefined> {
+    return new SimpleWrappedReactiveValue(
+      new FunctionalReactiveValue([this.cy, this.r], () => {
+        const cyValue = this.cy.getValue();
+        const rValue = this.r.getValue() ?? new Length(0);
+
+        if (cyValue === undefined) {
+          return undefined;
+        }
+
+        return new Coordinate(cyValue.getNumber() - rValue.getNumber());
+      }),
+    );
+  }
+
+  public getWidth(): ReactiveValue<Length | undefined> {
+    return new SimpleWrappedReactiveValue(
+      new FunctionalReactiveValue([this.r], () => {
+        const rValue = this.r.getValue();
+
+        if (rValue === undefined) {
+          return undefined;
+        }
+
+        return new Length(2 * rValue.getNumber());
+      }),
+    );
+  }
+
+  public getHeight(): ReactiveValue<Length | undefined> {
+    return this.getWidth();
   }
 }

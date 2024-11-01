@@ -1,12 +1,16 @@
 import { Transition } from 'lib/animation';
 import { Coordinate, Length } from 'lib/data-types';
-import { Easing, easeInOutCubic } from 'lib/easing';
+import { Easing, easeJumpToEnd } from 'lib/easing';
 import {
   Interpolation,
   interpolateCoordinate,
   interpolateLength,
 } from 'lib/interpolation';
 import { ReactiveValue, ensureReactive } from 'lib/reactive-values';
+import { Context, RequestFunction } from 'lib/request-functions';
+
+import { GeometryElement } from './geometry-element';
+import { Rectangle } from './rectangle';
 
 export type RectangleShapeTransition = {
   x: Transition<Coordinate | undefined> | undefined;
@@ -18,22 +22,41 @@ export type RectangleShapeTransition = {
 };
 
 export class RectangleShapeBuilder {
-  private _x?: Transition<Coordinate | undefined>;
-  private _y?: Transition<Coordinate | undefined>;
-  private _width?: Transition<Length | undefined>;
-  private _height?: Transition<Length | undefined>;
-  private _cornerRadiusX?: Transition<Length | undefined>;
-  private _cornerRadiusY?: Transition<Length | undefined>;
+  private _context: Context;
+  private _elements: GeometryElement[];
+  private _updatedShapes: Map<GeometryElement, Rectangle>;
 
-  public build(): RectangleShapeTransition {
-    return {
-      x: this._x,
-      y: this._y,
-      width: this._width,
-      height: this._height,
-      cornerRadiusX: this._cornerRadiusX,
-      cornerRadiusY: this._cornerRadiusY,
-    };
+  constructor({
+    context,
+    elements,
+    updatedShapes,
+  }: {
+    context: Context;
+    elements: GeometryElement[];
+    updatedShapes: Map<GeometryElement, Rectangle>;
+  }) {
+    this._context = context;
+    this._elements = elements;
+    this._updatedShapes = updatedShapes;
+
+    this._elements.forEach((element) => {
+      const x = element.getTopLeftX().unwrap();
+      const y = element.getTopLeftY().unwrap();
+      const width = element.getWidth().unwrap();
+      const height = element.getHeight().unwrap();
+      const rx = element.getRadiusX().unwrap();
+      const ry = element.getRadiusY().unwrap();
+
+      const rectangle = new Rectangle();
+      rectangle.x.wrap(x);
+      rectangle.y.wrap(y);
+      rectangle.width.wrap(width);
+      rectangle.height.wrap(height);
+      rectangle.rx.wrap(rx);
+      rectangle.ry.wrap(ry);
+
+      this._updatedShapes.set(element, rectangle);
+    });
   }
 
   /**
@@ -44,27 +67,36 @@ export class RectangleShapeBuilder {
    * @returns The current RectangleShapeBuilder instance.
    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/x
    */
-  public x(
-    x: ReactiveValue<Coordinate | undefined> | Coordinate | undefined | number,
+  public topLeftX(
+    x:
+      | RequestFunction<Coordinate | undefined>
+      | ReactiveValue<Coordinate | undefined>
+      | Coordinate
+      | undefined
+      | number,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): RectangleShapeBuilder {
-    if (typeof x === 'number') {
+    if (typeof x === 'function') {
+      x = x(this._context);
+    } else if (typeof x === 'number') {
       x = new Coordinate(x);
     }
 
     x = ensureReactive(x);
 
-    this._x = {
-      to: x,
-      easing,
-      interpolation,
-    };
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      this._updatedShapes
+        .get(element)!
+        .x.wrap(interpolation(element.getTopLeftX().unwrap(), x, progress));
+    });
 
     return this;
   }
@@ -77,27 +109,36 @@ export class RectangleShapeBuilder {
    * @returns The current RectangleShapeBuilder instance.
    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/y
    */
-  public y(
-    y: ReactiveValue<Coordinate | undefined> | Coordinate | undefined | number,
+  public topLeftY(
+    y:
+      | RequestFunction<Coordinate | undefined>
+      | ReactiveValue<Coordinate | undefined>
+      | Coordinate
+      | undefined
+      | number,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): RectangleShapeBuilder {
-    if (typeof y === 'number') {
+    if (typeof y === 'function') {
+      y = y(this._context);
+    } else if (typeof y === 'number') {
       y = new Coordinate(y);
     }
 
     y = ensureReactive(y);
 
-    this._y = {
-      to: y,
-      easing,
-      interpolation,
-    };
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      this._updatedShapes
+        .get(element)!
+        .y.wrap(interpolation(element.getTopLeftY().unwrap(), y, progress));
+    });
 
     return this;
   }
@@ -111,26 +152,37 @@ export class RectangleShapeBuilder {
    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/width
    */
   public width(
-    width: ReactiveValue<Length | undefined> | Length | undefined | number,
+    width:
+      | RequestFunction<Length | undefined>
+      | ReactiveValue<Length | undefined>
+      | Length
+      | undefined
+      | number,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateLength,
     }: {
       easing?: Easing;
       interpolation?: Interpolation<Length | undefined>;
     } = {},
   ): RectangleShapeBuilder {
-    if (typeof width === 'number') {
+    if (typeof width === 'function') {
+      width = width(this._context);
+    } else if (typeof width === 'number') {
       width = new Length(width);
     }
 
     width = ensureReactive(width);
 
-    this._width = {
-      to: width,
-      easing,
-      interpolation,
-    };
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      this._updatedShapes
+        .get(element)!
+        .width.wrap(
+          interpolation(element.getWidth().unwrap(), width, progress),
+        );
+    });
 
     return this;
   }
@@ -144,26 +196,37 @@ export class RectangleShapeBuilder {
    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/height
    */
   public height(
-    height: ReactiveValue<Length | undefined> | Length | undefined | number,
+    height:
+      | RequestFunction<Length | undefined>
+      | ReactiveValue<Length | undefined>
+      | Length
+      | undefined
+      | number,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateLength,
     }: {
       easing?: Easing;
       interpolation?: Interpolation<Length | undefined>;
     } = {},
   ): RectangleShapeBuilder {
-    if (typeof height === 'number') {
+    if (typeof height === 'function') {
+      height = height(this._context);
+    } else if (typeof height === 'number') {
       height = new Length(height);
     }
 
     height = ensureReactive(height);
 
-    this._height = {
-      to: height,
-      easing,
-      interpolation,
-    };
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      this._updatedShapes
+        .get(element)!
+        .height.wrap(
+          interpolation(element.getHeight().unwrap(), height, progress),
+        );
+    });
 
     return this;
   }
@@ -178,29 +241,36 @@ export class RectangleShapeBuilder {
    */
   public cornerRadiusX(
     cornerRadiusX:
+      | RequestFunction<Length | undefined>
       | ReactiveValue<Length | undefined>
       | Length
       | undefined
       | number,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateLength,
     }: {
       easing?: Easing;
       interpolation?: Interpolation<Length | undefined>;
     } = {},
   ): RectangleShapeBuilder {
-    if (typeof cornerRadiusX === 'number') {
+    if (typeof cornerRadiusX === 'function') {
+      cornerRadiusX = cornerRadiusX(this._context);
+    } else if (typeof cornerRadiusX === 'number') {
       cornerRadiusX = new Length(cornerRadiusX);
     }
 
     cornerRadiusX = ensureReactive(cornerRadiusX);
 
-    this._cornerRadiusX = {
-      to: cornerRadiusX,
-      easing,
-      interpolation,
-    };
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      this._updatedShapes
+        .get(element)!
+        .rx.wrap(
+          interpolation(element.getRadiusX().unwrap(), cornerRadiusX, progress),
+        );
+    });
 
     return this;
   }
@@ -215,29 +285,36 @@ export class RectangleShapeBuilder {
    */
   public cornerRadiusY(
     cornerRadiusY:
+      | RequestFunction<Length | undefined>
       | ReactiveValue<Length | undefined>
       | Length
       | undefined
       | number,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateLength,
     }: {
       easing?: Easing;
       interpolation?: Interpolation<Length | undefined>;
     } = {},
   ): RectangleShapeBuilder {
-    if (typeof cornerRadiusY === 'number') {
+    if (typeof cornerRadiusY === 'function') {
+      cornerRadiusY = cornerRadiusY(this._context);
+    } else if (typeof cornerRadiusY === 'number') {
       cornerRadiusY = new Length(cornerRadiusY);
     }
 
     cornerRadiusY = ensureReactive(cornerRadiusY);
 
-    this._cornerRadiusY = {
-      to: cornerRadiusY,
-      easing,
-      interpolation,
-    };
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      this._updatedShapes
+        .get(element)!
+        .ry.wrap(
+          interpolation(element.getRadiusY().unwrap(), cornerRadiusY, progress),
+        );
+    });
 
     return this;
   }

@@ -1,6 +1,6 @@
 import { Transition } from 'lib/animation';
 import { Coordinate, Position } from 'lib/data-types';
-import { Easing, easeInOutCubic } from 'lib/easing';
+import { Easing, easeJumpToEnd } from 'lib/easing';
 import { Interpolation, interpolateCoordinate } from 'lib/interpolation';
 import {
   ReactiveValue,
@@ -8,6 +8,9 @@ import {
   positionToCoordinates,
 } from 'lib/reactive-values';
 import { Context, RequestFunction } from 'lib/request-functions';
+
+import { CubicBezier } from './cubic-bezier';
+import { GeometryElement } from './geometry-element';
 
 export type CubicBezierShapeTransition = {
   startX?: Transition<Coordinate | undefined>;
@@ -22,31 +25,42 @@ export type CubicBezierShapeTransition = {
 
 export class CubicBezierShapeTransitionBuilder {
   private _context: Context;
+  private _elements: GeometryElement[];
+  private _updatedShapes: Map<GeometryElement, CubicBezier>;
 
-  private _startX?: Transition<Coordinate | undefined>;
-  private _startY?: Transition<Coordinate | undefined>;
-  private _control1X?: Transition<Coordinate | undefined>;
-  private _control1Y?: Transition<Coordinate | undefined>;
-  private _control2X?: Transition<Coordinate | undefined>;
-  private _control2Y?: Transition<Coordinate | undefined>;
-  private _endX?: Transition<Coordinate | undefined>;
-  private _endY?: Transition<Coordinate | undefined>;
-
-  constructor({ context }: { context: Context }) {
+  constructor({
+    context,
+    elements,
+    updatedShapes,
+  }: {
+    context: Context;
+    elements: GeometryElement[];
+    updatedShapes: Map<GeometryElement, CubicBezier>;
+  }) {
     this._context = context;
-  }
+    this._elements = elements;
+    this._updatedShapes = updatedShapes;
 
-  public build(): CubicBezierShapeTransition {
-    return {
-      startX: this._startX,
-      startY: this._startY,
-      control1X: this._control1X,
-      control1Y: this._control1Y,
-      control2X: this._control2X,
-      control2Y: this._control2Y,
-      endX: this._endX,
-      endY: this._endY,
-    };
+    this._elements.forEach((element) => {
+      const startX = element.getStartX().unwrap();
+      const startY = element.getStartY().unwrap();
+      const control1X = element.getControl1X().unwrap();
+      const control1Y = element.getControl1Y().unwrap();
+      const control2X = element.getControl2X().unwrap();
+      const control2Y = element.getControl2Y().unwrap();
+      const endX = element.getEndX().unwrap();
+      const endY = element.getEndY().unwrap();
+
+      const cubicBezier = new CubicBezier();
+      cubicBezier.startX.wrap(startX);
+      cubicBezier.startY.wrap(startY);
+      cubicBezier.control1X.wrap(control1X);
+      cubicBezier.control1Y.wrap(control1Y);
+      cubicBezier.control2X.wrap(control2X);
+      cubicBezier.control2Y.wrap(control2Y);
+      cubicBezier.endX.wrap(endX);
+      cubicBezier.endY.wrap(endY);
+    });
   }
 
   /**
@@ -65,7 +79,7 @@ export class CubicBezierShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -80,11 +94,15 @@ export class CubicBezierShapeTransitionBuilder {
 
     startX = ensureReactive(startX);
 
-    this._startX = {
-      to: startX,
-      easing,
-      interpolation,
-    };
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      this._updatedShapes
+        .get(element)!
+        .startX.wrap(
+          interpolation(element.getStartX().unwrap(), startX, progress),
+        );
+    });
 
     return this;
   }
@@ -105,7 +123,7 @@ export class CubicBezierShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -120,11 +138,15 @@ export class CubicBezierShapeTransitionBuilder {
 
     startY = ensureReactive(startY);
 
-    this._startY = {
-      to: startY,
-      easing,
-      interpolation,
-    };
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      this._updatedShapes
+        .get(element)!
+        .startY.wrap(
+          interpolation(element.getStartY().unwrap(), startY, progress),
+        );
+    });
 
     return this;
   }
@@ -143,7 +165,7 @@ export class CubicBezierShapeTransitionBuilder {
       | Position
       | undefined,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -180,7 +202,7 @@ export class CubicBezierShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -195,11 +217,15 @@ export class CubicBezierShapeTransitionBuilder {
 
     control1X = ensureReactive(control1X);
 
-    this._control1X = {
-      to: control1X,
-      easing,
-      interpolation,
-    };
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      this._updatedShapes
+        .get(element)!
+        .control1X.wrap(
+          interpolation(element.getControl1X().unwrap(), control1X, progress),
+        );
+    });
 
     return this;
   }
@@ -220,7 +246,7 @@ export class CubicBezierShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -235,11 +261,15 @@ export class CubicBezierShapeTransitionBuilder {
 
     control1Y = ensureReactive(control1Y);
 
-    this._control1Y = {
-      to: control1Y,
-      easing,
-      interpolation,
-    };
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      this._updatedShapes
+        .get(element)!
+        .control1Y.wrap(
+          interpolation(element.getControl1Y().unwrap(), control1Y, progress),
+        );
+    });
 
     return this;
   }
@@ -258,7 +288,7 @@ export class CubicBezierShapeTransitionBuilder {
       | Position
       | undefined,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -295,7 +325,7 @@ export class CubicBezierShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -310,11 +340,15 @@ export class CubicBezierShapeTransitionBuilder {
 
     control2X = ensureReactive(control2X);
 
-    this._control2X = {
-      to: control2X,
-      easing,
-      interpolation,
-    };
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      this._updatedShapes
+        .get(element)!
+        .control2X.wrap(
+          interpolation(element.getControl2X().unwrap(), control2X, progress),
+        );
+    });
 
     return this;
   }
@@ -335,7 +369,7 @@ export class CubicBezierShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -350,11 +384,15 @@ export class CubicBezierShapeTransitionBuilder {
 
     control2Y = ensureReactive(control2Y);
 
-    this._control2Y = {
-      to: control2Y,
-      easing,
-      interpolation,
-    };
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      this._updatedShapes
+        .get(element)!
+        .control2Y.wrap(
+          interpolation(element.getControl2Y().unwrap(), control2Y, progress),
+        );
+    });
 
     return this;
   }
@@ -373,7 +411,7 @@ export class CubicBezierShapeTransitionBuilder {
       | Position
       | undefined,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -410,7 +448,7 @@ export class CubicBezierShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -425,11 +463,13 @@ export class CubicBezierShapeTransitionBuilder {
 
     endX = ensureReactive(endX);
 
-    this._endX = {
-      to: endX,
-      easing,
-      interpolation,
-    };
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      this._updatedShapes
+        .get(element)!
+        .endX.wrap(interpolation(element.getEndX().unwrap(), endX, progress));
+    });
 
     return this;
   }
@@ -450,7 +490,7 @@ export class CubicBezierShapeTransitionBuilder {
       | undefined
       | number,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;
@@ -465,11 +505,13 @@ export class CubicBezierShapeTransitionBuilder {
 
     endY = ensureReactive(endY);
 
-    this._endY = {
-      to: endY,
-      easing,
-      interpolation,
-    };
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      this._updatedShapes
+        .get(element)!
+        .endY.wrap(interpolation(element.getEndY().unwrap(), endY, progress));
+    });
 
     return this;
   }
@@ -488,7 +530,7 @@ export class CubicBezierShapeTransitionBuilder {
       | Position
       | undefined,
     {
-      easing = easeInOutCubic,
+      easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
     }: {
       easing?: Easing;

@@ -143,4 +143,36 @@ export class CubicBezier extends Shape {
       },
     );
   }
+
+  public getStartX(): ReactiveValue<Coordinate | undefined> {
+    return this.startX;
+  }
+
+  public getStartY(): ReactiveValue<Coordinate | undefined> {
+    return this.startY;
+  }
+
+  public getEndX(): ReactiveValue<Coordinate | undefined> {
+    return this.endX;
+  }
+
+  public getEndY(): ReactiveValue<Coordinate | undefined> {
+    return this.endY;
+  }
+
+  public getControlX1(): ReactiveValue<Coordinate | undefined> {
+    return this.control1X;
+  }
+
+  public getControlY1(): ReactiveValue<Coordinate | undefined> {
+    return this.control1Y;
+  }
+
+  public getControlX2(): ReactiveValue<Coordinate | undefined> {
+    return this.control2X;
+  }
+
+  public getControlY2(): ReactiveValue<Coordinate | undefined> {
+    return this.control2Y;
+  }
 }

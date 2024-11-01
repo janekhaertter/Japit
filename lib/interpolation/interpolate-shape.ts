@@ -1,3 +1,4 @@
+import { AlphaValue, Coordinate, Length } from 'lib/data-types';
 import {
   Circle,
   CircleShapeTransition,
@@ -10,7 +11,7 @@ import {
 } from 'lib/geometry-elements';
 import { CubicBezier } from 'lib/geometry-elements/cubic-bezier';
 import { CubicBezierShapeTransition } from 'lib/geometry-elements/cubic-bezier-shape-builder';
-import { FunctionalReactiveValue } from 'lib/reactive-values';
+import { FunctionalReactiveValue, ReactiveValue } from 'lib/reactive-values';
 
 import { Interpolation } from './interpolation';
 
@@ -166,6 +167,111 @@ export function interpolateToCubicBezier(
       }
 
       return res;
+    });
+  };
+}
+
+export type ShapeInterpolation = (
+  from: ReactiveValue<Shape | undefined>,
+  progress: ReactiveValue<AlphaValue>,
+) => ReactiveValue<Shape | undefined>;
+
+export function interpolateToShape(
+  to: ReactiveValue<Shape | undefined>,
+): ShapeInterpolation {
+  return (from, progress) => {
+    return new FunctionalReactiveValue([to, from, progress], () => {
+      const fromValue = from.getValue();
+      const progressValue = progress.getValue().getNumber();
+      const toValue = to.getValue();
+
+      if (progressValue === 0) return fromValue;
+      if (progressValue === 1) return toValue;
+
+      if (fromValue === undefined || toValue === undefined) return toValue;
+
+      const rectFrom = fromValue.toRectangle();
+      const rectTo = toValue.toRectangle();
+
+      if (rectFrom !== undefined && rectTo !== undefined) {
+        const res = new Rectangle();
+
+        res.x.wrap(
+          new FunctionalReactiveValue([rectFrom.x, rectTo.x], () => {
+            const xFromValue = rectFrom.x.getValue();
+            const xToValue = rectTo.x.getValue();
+
+            return new Coordinate(
+              (1 - progressValue) * (xFromValue?.getNumber() ?? 0) +
+                progressValue * (xToValue?.getNumber() ?? 0),
+            );
+          }),
+        );
+
+        res.y.wrap(
+          new FunctionalReactiveValue([rectFrom.y, rectTo.y], () => {
+            const yFromValue = rectFrom.y.getValue();
+            const yToValue = rectTo.y.getValue();
+
+            return new Coordinate(
+              (1 - progressValue) * (yFromValue?.getNumber() ?? 0) +
+                progressValue * (yToValue?.getNumber() ?? 0),
+            );
+          }),
+        );
+
+        res.width.wrap(
+          new FunctionalReactiveValue([rectFrom.width, rectTo.width], () => {
+            const widthFromValue = rectFrom.width.getValue();
+            const widthToValue = rectTo.width.getValue();
+
+            return new Length(
+              (1 - progressValue) * (widthFromValue?.getNumber() ?? 0) +
+                progressValue * (widthToValue?.getNumber() ?? 0),
+            );
+          }),
+        );
+
+        res.height.wrap(
+          new FunctionalReactiveValue([rectFrom.height, rectTo.height], () => {
+            const heightFromValue = rectFrom.height.getValue();
+            const heightToValue = rectTo.height.getValue();
+
+            return new Length(
+              (1 - progressValue) * (heightFromValue?.getNumber() ?? 0) +
+                progressValue * (heightToValue?.getNumber() ?? 0),
+            );
+          }),
+        );
+
+        res.rx.wrap(
+          new FunctionalReactiveValue([rectFrom.rx, rectTo.rx], () => {
+            const rxFromValue = rectFrom.rx.getValue();
+            const rxToValue = rectTo.rx.getValue();
+
+            return new Length(
+              (1 - progressValue) * (rxFromValue?.getNumber() ?? 0) +
+                progressValue * (rxToValue?.getNumber() ?? 0),
+            );
+          }),
+        );
+
+        res.ry.wrap(
+          new FunctionalReactiveValue([rectFrom.ry, rectTo.ry], () => {
+            const ryFromValue = rectFrom.ry.getValue();
+            const ryToValue = rectTo.ry.getValue();
+
+            return new Length(
+              (1 - progressValue) * (ryFromValue?.getNumber() ?? 0) +
+                progressValue * (ryToValue?.getNumber() ?? 0),
+            );
+          }),
+        );
+
+        return res;
+      }
+
+      return toValue;
     });
   };
 }
