@@ -74,6 +74,10 @@ export abstract class Shape {
     return ensureReactive(undefined);
   }
 
+  public getChild(): ReactiveValue<SVGElement | undefined> {
+    return ensureReactive(undefined);
+  }
+
   public toRectangle(): Rectangle | undefined {
     return undefined;
   }

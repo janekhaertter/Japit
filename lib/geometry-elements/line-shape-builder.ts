@@ -3,11 +3,11 @@ import { Coordinate, Position } from 'lib/data-types';
 import { Easing, easeJumpToEnd } from 'lib/easing';
 import { Interpolation, interpolateCoordinate } from 'lib/interpolation';
 import {
-  ReactiveValue,
-  ensureReactive,
+  PrimitiveReactiveValue,
+  SimpleWrappedReactiveValue,
   positionToCoordinates,
 } from 'lib/reactive-values';
-import { Context, RequestFunction } from 'lib/request-functions';
+import { Context, RequestObject } from 'lib/request-object';
 
 import { GeometryElement } from './geometry-element';
 import { Line } from './line';
@@ -53,6 +53,36 @@ export class LineShapeTransitionBuilder {
     });
   }
 
+  private _plainHelper<T extends Exclude<any, RequestObject<any>>>(
+    arg: RequestObject<T> | T,
+    {
+      easing,
+      interpolation,
+    }: {
+      easing: Easing;
+      interpolation: Interpolation<T>;
+    },
+    valueExtractor: (line: Line) => SimpleWrappedReactiveValue<T>,
+    oldValueExtractor: (
+      element: GeometryElement,
+    ) => SimpleWrappedReactiveValue<T>,
+  ): LineShapeTransitionBuilder {
+    const parsed =
+      arg instanceof RequestObject
+        ? arg.getReactiveValue(this._context)
+        : new PrimitiveReactiveValue(arg);
+
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      valueExtractor(this._updatedShapes.get(element)!).wrap(
+        interpolation(oldValueExtractor(element).unwrap(), parsed, progress),
+      );
+    });
+
+    return this;
+  }
+
   /**
    * Transitions the x-coordinate of the starting point of the line.
    * @param startX - The x-coordinate to transition to.
@@ -63,8 +93,7 @@ export class LineShapeTransitionBuilder {
    */
   public startX(
     startX:
-      | RequestFunction<Coordinate | undefined>
-      | ReactiveValue<Coordinate | undefined>
+      | RequestObject<Coordinate | undefined>
       | Coordinate
       | undefined
       | number,
@@ -76,22 +105,16 @@ export class LineShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): LineShapeTransitionBuilder {
-    if (typeof startX === 'function') {
-      startX = startX(this._context);
-    } else if (typeof startX === 'number') {
+    if (typeof startX === 'number') {
       startX = new Coordinate(startX);
     }
 
-    startX = ensureReactive(startX);
-
-    const progress = easing(this._context.progress);
-
-    this._elements.forEach((element) => {
-      this._updatedShapes
-        .get(element)!
-        .x1.wrap(interpolation(element.getStartX().unwrap(), startX, progress));
-    });
-    return this;
+    return this._plainHelper(
+      startX,
+      { easing, interpolation },
+      (line) => line.x1,
+      (element) => element.getStartX(),
+    );
   }
 
   /**
@@ -104,8 +127,7 @@ export class LineShapeTransitionBuilder {
    */
   public startY(
     startY:
-      | RequestFunction<Coordinate | undefined>
-      | ReactiveValue<Coordinate | undefined>
+      | RequestObject<Coordinate | undefined>
       | Coordinate
       | undefined
       | number,
@@ -117,23 +139,16 @@ export class LineShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): LineShapeTransitionBuilder {
-    if (typeof startY === 'function') {
-      startY = startY(this._context);
-    } else if (typeof startY === 'number') {
+    if (typeof startY === 'number') {
       startY = new Coordinate(startY);
     }
 
-    startY = ensureReactive(startY);
-
-    const progress = easing(this._context.progress);
-
-    this._elements.forEach((element) => {
-      this._updatedShapes
-        .get(element)!
-        .y1.wrap(interpolation(element.getStartY().unwrap(), startY, progress));
-    });
-
-    return this;
+    return this._plainHelper(
+      startY,
+      { easing, interpolation },
+      (line) => line.y1,
+      (element) => element.getStartY(),
+    );
   }
 
   /**
@@ -144,11 +159,7 @@ export class LineShapeTransitionBuilder {
    * @returns The current {@link LineShapeTransitionBuilder} instance.
    */
   public start(
-    start:
-      | RequestFunction<Position | undefined>
-      | ReactiveValue<Position | undefined>
-      | Position
-      | undefined,
+    start: RequestObject<Position | undefined> | Position | undefined,
     {
       easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
@@ -157,13 +168,12 @@ export class LineShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): LineShapeTransitionBuilder {
-    if (typeof start === 'function') {
-      start = start(this._context);
-    }
+    const parsed =
+      start instanceof RequestObject
+        ? start.getReactiveValue(this._context)
+        : new PrimitiveReactiveValue(start);
 
-    start = ensureReactive(start);
-
-    const { x, y } = positionToCoordinates(start);
+    const { x, y } = positionToCoordinates(parsed);
 
     this.startX(x, { easing, interpolation });
     this.startY(y, { easing, interpolation });
@@ -181,8 +191,7 @@ export class LineShapeTransitionBuilder {
    */
   public endX(
     endX:
-      | RequestFunction<Coordinate | undefined>
-      | ReactiveValue<Coordinate | undefined>
+      | RequestObject<Coordinate | undefined>
       | Coordinate
       | undefined
       | number,
@@ -194,23 +203,16 @@ export class LineShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): LineShapeTransitionBuilder {
-    if (typeof endX === 'function') {
-      endX = endX(this._context);
-    } else if (typeof endX === 'number') {
+    if (typeof endX === 'number') {
       endX = new Coordinate(endX);
     }
 
-    endX = ensureReactive(endX);
-
-    const progress = easing(this._context.progress);
-
-    this._elements.forEach((element) => {
-      this._updatedShapes
-        .get(element)!
-        .x2.wrap(interpolation(element.getEndX().unwrap(), endX, progress));
-    });
-
-    return this;
+    return this._plainHelper(
+      endX,
+      { easing, interpolation },
+      (line) => line.x2,
+      (element) => element.getEndX(),
+    );
   }
 
   /**
@@ -223,8 +225,7 @@ export class LineShapeTransitionBuilder {
    */
   public endY(
     endY:
-      | RequestFunction<Coordinate | undefined>
-      | ReactiveValue<Coordinate | undefined>
+      | RequestObject<Coordinate | undefined>
       | Coordinate
       | undefined
       | number,
@@ -236,23 +237,16 @@ export class LineShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): LineShapeTransitionBuilder {
-    if (typeof endY === 'function') {
-      endY = endY(this._context);
-    } else if (typeof endY === 'number') {
+    if (typeof endY === 'number') {
       endY = new Coordinate(endY);
     }
 
-    endY = ensureReactive(endY);
-
-    const progress = easing(this._context.progress);
-
-    this._elements.forEach((element) => {
-      this._updatedShapes
-        .get(element)!
-        .y2.wrap(interpolation(element.getEndY().unwrap(), endY, progress));
-    });
-
-    return this;
+    return this._plainHelper(
+      endY,
+      { easing, interpolation },
+      (line) => line.y2,
+      (element) => element.getEndY(),
+    );
   }
 
   /**
@@ -263,11 +257,7 @@ export class LineShapeTransitionBuilder {
    * @returns The current {@link LineShapeTransitionBuilder} instance.
    */
   public end(
-    end:
-      | RequestFunction<Position | undefined>
-      | ReactiveValue<Position | undefined>
-      | Position
-      | undefined,
+    end: RequestObject<Position | undefined> | Position | undefined,
     {
       easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
@@ -276,13 +266,12 @@ export class LineShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): LineShapeTransitionBuilder {
-    if (typeof end === 'function') {
-      end = end(this._context);
-    }
+    const parsed =
+      end instanceof RequestObject
+        ? end.getReactiveValue(this._context)
+        : new PrimitiveReactiveValue(end);
 
-    end = ensureReactive(end);
-
-    const { x, y } = positionToCoordinates(end);
+    const { x, y } = positionToCoordinates(parsed);
 
     this.endX(x, { easing, interpolation });
     this.endY(y, { easing, interpolation });

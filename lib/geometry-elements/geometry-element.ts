@@ -120,6 +120,8 @@ export class GeometryElement {
     new SimpleWrappedReactiveValue(ensureReactive(undefined));
   private _control2Y: SimpleWrappedReactiveValue<Coordinate | undefined> =
     new SimpleWrappedReactiveValue(ensureReactive(undefined));
+  private _child: SimpleWrappedReactiveValue<SVGElement | undefined> =
+    new SimpleWrappedReactiveValue(ensureReactive(undefined));
 
   constructor() {
     this.setupStyle(this.fill, 'fill');
@@ -154,6 +156,7 @@ export class GeometryElement {
       this._control1Y.wrap(shape.getControlY1());
       this._control2X.wrap(shape.getControlX2());
       this._control2Y.wrap(shape.getControlY2());
+      this._child.wrap(shape.getChild());
     });
   }
 
@@ -261,5 +264,9 @@ export class GeometryElement {
 
   public getControl2Y(): SimpleWrappedReactiveValue<Coordinate | undefined> {
     return this._control2Y;
+  }
+
+  public getChild(): SimpleWrappedReactiveValue<SVGElement | undefined> {
+    return this._child;
   }
 }

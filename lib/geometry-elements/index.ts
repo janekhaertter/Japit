@@ -11,5 +11,4 @@ export * from './path';
 
 export * from './circle-shape-builder';
 export * from './line-shape-builder';
-export * from './path-shape-builder';
 export * from './rectangle-shape-builder';

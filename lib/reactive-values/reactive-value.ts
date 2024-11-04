@@ -4,15 +4,22 @@
 //   const a: ReactiveValue<number | undefined> = value;
 // }
 // ```
+import { RequestObject } from 'lib/request-object';
+
 // would fail as value of type ReactiveValue<number> is not assignable to a of type ReactiveValue<number | undefined>.
 export type ReactiveValueHandler<T> = <R extends T>(value: R) => void;
 
-export abstract class ReactiveValue<T> {
+export abstract class ReactiveValue<T> extends RequestObject<T> {
   protected _onChangeHandlers: Set<ReactiveValueHandler<T>> = new Set();
   private _value: T;
 
   constructor(startingValue: T) {
+    super();
     this._value = startingValue;
+  }
+
+  public getReactiveValue(): ReactiveValue<T> {
+    return this;
   }
 
   protected get value(): T {

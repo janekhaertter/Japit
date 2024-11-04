@@ -13,12 +13,15 @@ import { Easing, easeInOutCubic, easeLinear } from 'lib/easing';
 import {
   Circle,
   CircleShapeTransitionBuilder,
+  ContainerShape,
   GeometryElement,
   Line,
   LineShapeTransitionBuilder,
+  Rectangle,
   RectangleShapeBuilder as RectangleShapeTransitionBuilder,
   Shape,
 } from 'lib/geometry-elements';
+import { ContainerShapeTransitionBuilder } from 'lib/geometry-elements/container-shape-transition-builder';
 import { CubicBezier } from 'lib/geometry-elements/cubic-bezier';
 import { CubicBezierShapeTransitionBuilder } from 'lib/geometry-elements/cubic-bezier-shape-builder';
 import {
@@ -31,8 +34,12 @@ import {
   interpolateNumber,
   interpolateToShape,
 } from 'lib/interpolation';
-import { ReactiveValue, ensureReactive } from 'lib/reactive-values';
-import { Context, RequestFunction } from 'lib/request-functions';
+import {
+  PrimitiveReactiveValue,
+  SimpleWrappedReactiveValue,
+  ensureReactive,
+} from 'lib/reactive-values';
+import { Context, RequestObject } from 'lib/request-object';
 
 export class TransitionBuilder {
   private _elements: GeometryElement[];
@@ -49,6 +56,33 @@ export class TransitionBuilder {
     this._context = context;
   }
 
+  private _plainHelper<T extends Exclude<any, RequestObject<any>>>(
+    arg: RequestObject<T> | T,
+    {
+      easing,
+      interpolation,
+    }: {
+      easing: Easing;
+      interpolation: Interpolation<T>;
+    },
+    valueExtractor: (element: GeometryElement) => SimpleWrappedReactiveValue<T>,
+  ): TransitionBuilder {
+    const parsed =
+      arg instanceof RequestObject
+        ? arg.getReactiveValue(this._context)
+        : new PrimitiveReactiveValue(arg);
+
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      this._context.updatedValues.set(
+        valueExtractor(element),
+        interpolation(valueExtractor(element).unwrap(), parsed, progress),
+      );
+    });
+    return this;
+  }
+
   /**
    * Transitions the z-index of the current selection. Elements with a higher z-index will be drawn on top of elements with a lower z-index.
    * @param zIndex - The z-index to transition to.
@@ -57,7 +91,7 @@ export class TransitionBuilder {
    * @returns The current TransitionBuilder instance.
    */
   public zIndex(
-    zIndex: RequestFunction<number> | ReactiveValue<number> | number,
+    zIndex: RequestObject<number> | number,
     {
       easing = easeInOutCubic,
       interpolation = interpolateNumber,
@@ -66,23 +100,11 @@ export class TransitionBuilder {
       interpolation?: Interpolation<number>;
     } = {},
   ): TransitionBuilder {
-    zIndex =
-      typeof zIndex === 'function'
-        ? zIndex(this._context)
-        : ensureReactive(zIndex);
-
-    this._elements.forEach((e) => {
-      this._context.updatedValues.set(
-        e.zIndex,
-        interpolation(
-          e.zIndex.unwrap(),
-          zIndex,
-          easing(this._context.progress),
-        ),
-      );
-    });
-
-    return this;
+    return this._plainHelper(
+      zIndex,
+      { easing, interpolation },
+      (element) => element.zIndex,
+    );
   }
 
   /**
@@ -94,12 +116,7 @@ export class TransitionBuilder {
    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/fill
    */
   public fill(
-    fill:
-      | RequestFunction<Color | undefined>
-      | ReactiveValue<Color | undefined>
-      | Color
-      | undefined
-      | string,
+    fill: RequestObject<Color | undefined> | Color | undefined | string,
     {
       easing = easeInOutCubic,
       interpolation = interpolateColorRGB,
@@ -108,22 +125,14 @@ export class TransitionBuilder {
       interpolation?: Interpolation<Color | undefined>;
     } = {},
   ): TransitionBuilder {
-    if (typeof fill === 'function') {
-      fill = fill(this._context);
-    } else if (typeof fill === 'string') {
+    if (typeof fill === 'string') {
       fill = new Color(fill);
     }
-
-    fill = ensureReactive(fill);
-
-    this._elements.forEach((e) => {
-      this._context.updatedValues.set(
-        e.fill,
-        interpolation(e.fill.unwrap(), fill, easing(this._context.progress)),
-      );
-    });
-
-    return this;
+    return this._plainHelper(
+      fill,
+      { easing, interpolation },
+      (element) => element.fill,
+    );
   }
 
   /**
@@ -135,11 +144,7 @@ export class TransitionBuilder {
    * @see https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
    */
   public cursor(
-    cursor:
-      | RequestFunction<Cursor | undefined>
-      | ReactiveValue<Cursor | undefined>
-      | Cursor
-      | undefined,
+    cursor: RequestObject<Cursor | undefined> | Cursor | undefined,
     {
       easing = easeInOutCubic,
       interpolation = interpolateDiscrete,
@@ -148,24 +153,11 @@ export class TransitionBuilder {
       interpolation?: Interpolation<Cursor | undefined>;
     } = {},
   ): TransitionBuilder {
-    if (typeof cursor === 'function') {
-      cursor = cursor(this._context);
-    }
-
-    cursor = ensureReactive(cursor);
-
-    this._elements.forEach((e) => {
-      this._context.updatedValues.set(
-        e.cursor,
-        interpolation(
-          e.cursor.unwrap(),
-          cursor,
-          easing(this._context.progress),
-        ),
-      );
-    });
-
-    return this;
+    return this._plainHelper(
+      cursor,
+      { easing, interpolation },
+      (element) => element.cursor,
+    );
   }
 
   /**
@@ -178,8 +170,7 @@ export class TransitionBuilder {
    */
   public fillOpacity(
     fillOpacity:
-      | RequestFunction<AlphaValue | undefined>
-      | ReactiveValue<AlphaValue | undefined>
+      | RequestObject<AlphaValue | undefined>
       | AlphaValue
       | undefined
       | number,
@@ -191,26 +182,15 @@ export class TransitionBuilder {
       interpolation?: Interpolation<AlphaValue | undefined>;
     } = {},
   ): TransitionBuilder {
-    if (typeof fillOpacity === 'function') {
-      fillOpacity = fillOpacity(this._context);
-    } else if (typeof fillOpacity === 'number') {
+    if (typeof fillOpacity === 'number') {
       fillOpacity = new AlphaValue(fillOpacity);
     }
 
-    fillOpacity = ensureReactive(fillOpacity);
-
-    this._elements.forEach((e) => {
-      this._context.updatedValues.set(
-        e.fillOpacity,
-        interpolation(
-          e.fillOpacity.unwrap(),
-          fillOpacity,
-          easing(this._context.progress),
-        ),
-      );
-    });
-
-    return this;
+    return this._plainHelper(
+      fillOpacity,
+      { easing, interpolation },
+      (element) => element.fillOpacity,
+    );
   }
 
   /**
@@ -223,8 +203,7 @@ export class TransitionBuilder {
    */
   public opacity(
     opacity:
-      | RequestFunction<AlphaValue | undefined>
-      | ReactiveValue<AlphaValue | undefined>
+      | RequestObject<AlphaValue | undefined>
       | AlphaValue
       | undefined
       | number,
@@ -236,26 +215,15 @@ export class TransitionBuilder {
       interpolation?: Interpolation<AlphaValue | undefined>;
     } = {},
   ): TransitionBuilder {
-    if (typeof opacity === 'function') {
-      opacity = opacity(this._context);
-    } else if (typeof opacity === 'number') {
+    if (typeof opacity === 'number') {
       opacity = new AlphaValue(opacity);
     }
 
-    opacity = ensureReactive(opacity);
-
-    this._elements.forEach((e) => {
-      this._context.updatedValues.set(
-        e.opacity,
-        interpolation(
-          e.opacity.unwrap(),
-          opacity,
-          easing(this._context.progress),
-        ),
-      );
-    });
-
-    return this;
+    return this._plainHelper(
+      opacity,
+      { easing, interpolation },
+      (element) => element.opacity,
+    );
   }
 
   /**
@@ -267,12 +235,7 @@ export class TransitionBuilder {
    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke
    */
   public stroke(
-    stroke:
-      | RequestFunction<Color | undefined>
-      | ReactiveValue<Color | undefined>
-      | Color
-      | undefined
-      | string,
+    stroke: RequestObject<Color | undefined> | Color | undefined | string,
     {
       easing = easeInOutCubic,
       interpolation = interpolateColorRGB,
@@ -281,26 +244,15 @@ export class TransitionBuilder {
       interpolation?: Interpolation<Color | undefined>;
     } = {},
   ): TransitionBuilder {
-    if (typeof stroke === 'function') {
-      stroke = stroke(this._context);
-    } else if (typeof stroke === 'string') {
+    if (typeof stroke === 'string') {
       stroke = new Color(stroke);
     }
 
-    stroke = ensureReactive(stroke);
-
-    this._elements.forEach((e) => {
-      this._context.updatedValues.set(
-        e.stroke,
-        interpolation(
-          e.stroke.unwrap(),
-          stroke,
-          easing(this._context.progress),
-        ),
-      );
-    });
-
-    return this;
+    return this._plainHelper(
+      stroke,
+      { easing, interpolation },
+      (element) => element.stroke,
+    );
   }
 
   /**
@@ -313,8 +265,7 @@ export class TransitionBuilder {
    */
   public strokeOpacity(
     strokeOpacity:
-      | RequestFunction<AlphaValue | undefined>
-      | ReactiveValue<AlphaValue | undefined>
+      | RequestObject<AlphaValue | undefined>
       | AlphaValue
       | undefined
       | number,
@@ -326,26 +277,15 @@ export class TransitionBuilder {
       interpolation?: Interpolation<AlphaValue | undefined>;
     } = {},
   ): TransitionBuilder {
-    if (typeof strokeOpacity === 'function') {
-      strokeOpacity = strokeOpacity(this._context);
-    } else if (typeof strokeOpacity === 'number') {
+    if (typeof strokeOpacity === 'number') {
       strokeOpacity = new AlphaValue(strokeOpacity);
     }
 
-    strokeOpacity = ensureReactive(strokeOpacity);
-
-    this._elements.forEach((e) => {
-      this._context.updatedValues.set(
-        e.strokeOpacity,
-        interpolation(
-          e.strokeOpacity.unwrap(),
-          strokeOpacity,
-          easing(this._context.progress),
-        ),
-      );
-    });
-
-    return this;
+    return this._plainHelper(
+      strokeOpacity,
+      { easing, interpolation },
+      (element) => element.strokeOpacity,
+    );
   }
 
   /**
@@ -358,8 +298,7 @@ export class TransitionBuilder {
    */
   public strokeWidth(
     strokeWidth:
-      | RequestFunction<Length | undefined>
-      | ReactiveValue<Length | undefined>
+      | RequestObject<Length | undefined>
       | Length
       | undefined
       | number,
@@ -371,26 +310,15 @@ export class TransitionBuilder {
       interpolation?: Interpolation<Length | undefined>;
     } = {},
   ): TransitionBuilder {
-    if (typeof strokeWidth === 'function') {
-      strokeWidth = strokeWidth(this._context);
-    } else if (typeof strokeWidth === 'number') {
+    if (typeof strokeWidth === 'number') {
       strokeWidth = new Length(strokeWidth);
     }
 
-    strokeWidth = ensureReactive(strokeWidth);
-
-    this._elements.forEach((e) => {
-      this._context.updatedValues.set(
-        e.strokeWidth,
-        interpolation(
-          e.strokeWidth.unwrap(),
-          strokeWidth,
-          easing(this._context.progress),
-        ),
-      );
-    });
-
-    return this;
+    return this._plainHelper(
+      strokeWidth,
+      { easing, interpolation },
+      (element) => element.strokeWidth,
+    );
   }
 
   /**
@@ -403,8 +331,7 @@ export class TransitionBuilder {
    */
   public strokeLinecap(
     strokeLinecap:
-      | RequestFunction<StrokeLinecap | undefined>
-      | ReactiveValue<StrokeLinecap | undefined>
+      | RequestObject<StrokeLinecap | undefined>
       | StrokeLinecap
       | undefined,
     {
@@ -415,24 +342,11 @@ export class TransitionBuilder {
       interpolation?: Interpolation<StrokeLinecap | undefined>;
     } = {},
   ): TransitionBuilder {
-    if (typeof strokeLinecap === 'function') {
-      strokeLinecap = strokeLinecap(this._context);
-    }
-
-    strokeLinecap = ensureReactive(strokeLinecap);
-
-    this._elements.forEach((e) => {
-      this._context.updatedValues.set(
-        e.strokeLinecap,
-        interpolation(
-          e.strokeLinecap.unwrap(),
-          strokeLinecap,
-          easing(this._context.progress),
-        ),
-      );
-    });
-
-    return this;
+    return this._plainHelper(
+      strokeLinecap,
+      { easing, interpolation },
+      (element) => element.strokeLinecap,
+    );
   }
 
   /**
@@ -445,8 +359,7 @@ export class TransitionBuilder {
    */
   public strokeLinejoin(
     strokeLinejoin:
-      | RequestFunction<StrokeLinejoin | undefined>
-      | ReactiveValue<StrokeLinejoin | undefined>
+      | RequestObject<StrokeLinejoin | undefined>
       | StrokeLinejoin
       | undefined,
     {
@@ -457,24 +370,11 @@ export class TransitionBuilder {
       interpolation?: Interpolation<StrokeLinejoin | undefined>;
     } = {},
   ): TransitionBuilder {
-    if (typeof strokeLinejoin === 'function') {
-      strokeLinejoin = strokeLinejoin(this._context);
-    }
-
-    strokeLinejoin = ensureReactive(strokeLinejoin);
-
-    this._elements.forEach((e) => {
-      this._context.updatedValues.set(
-        e.strokeLinejoin,
-        interpolation(
-          e.strokeLinejoin.unwrap(),
-          strokeLinejoin,
-          easing(this._context.progress),
-        ),
-      );
-    });
-
-    return this;
+    return this._plainHelper(
+      strokeLinejoin,
+      { easing, interpolation },
+      (element) => element.strokeLinejoin,
+    );
   }
 
   /**
@@ -487,8 +387,7 @@ export class TransitionBuilder {
    */
   public strokeMiterlimit(
     strokeMiterlimit:
-      | RequestFunction<Delta | undefined>
-      | ReactiveValue<Delta | undefined>
+      | RequestObject<Delta | undefined>
       | Delta
       | number
       | undefined,
@@ -500,26 +399,15 @@ export class TransitionBuilder {
       interpolation?: Interpolation<Delta | undefined>;
     } = {},
   ): TransitionBuilder {
-    if (typeof strokeMiterlimit === 'function') {
-      strokeMiterlimit = strokeMiterlimit(this._context);
-    } else if (typeof strokeMiterlimit === 'number') {
+    if (typeof strokeMiterlimit === 'number') {
       strokeMiterlimit = new Delta(strokeMiterlimit);
     }
 
-    strokeMiterlimit = ensureReactive(strokeMiterlimit);
-
-    this._elements.forEach((e) => {
-      this._context.updatedValues.set(
-        e.strokeMiterlimit,
-        interpolation(
-          e.strokeMiterlimit.unwrap(),
-          strokeMiterlimit,
-          easing(this._context.progress),
-        ),
-      );
-    });
-
-    return this;
+    return this._plainHelper(
+      strokeMiterlimit,
+      { easing, interpolation },
+      (element) => element.strokeMiterlimit,
+    );
   }
 
   /**
@@ -532,8 +420,7 @@ export class TransitionBuilder {
    */
   public strokeDasharray(
     strokeDasharray:
-      | RequestFunction<StrokeDasharray | undefined>
-      | ReactiveValue<StrokeDasharray | undefined>
+      | RequestObject<StrokeDasharray | undefined>
       | StrokeDasharray
       | undefined,
     {
@@ -544,24 +431,11 @@ export class TransitionBuilder {
       interpolation?: Interpolation<StrokeDasharray | undefined>;
     } = {},
   ): TransitionBuilder {
-    if (typeof strokeDasharray === 'function') {
-      strokeDasharray = strokeDasharray(this._context);
-    }
-
-    strokeDasharray = ensureReactive(strokeDasharray);
-
-    this._elements.forEach((e) => {
-      this._context.updatedValues.set(
-        e.strokeDasharray,
-        interpolation(
-          e.strokeDasharray.unwrap(),
-          strokeDasharray,
-          easing(this._context.progress),
-        ),
-      );
-    });
-
-    return this;
+    return this._plainHelper(
+      strokeDasharray,
+      { easing, interpolation },
+      (element) => element.strokeDasharray,
+    );
   }
 
   /**
@@ -574,8 +448,7 @@ export class TransitionBuilder {
    */
   public strokeDashoffset(
     strokeDashoffset:
-      | RequestFunction<Length | undefined>
-      | ReactiveValue<Length | undefined>
+      | RequestObject<Length | undefined>
       | Length
       | number
       | undefined,
@@ -587,26 +460,15 @@ export class TransitionBuilder {
       interpolation?: Interpolation<Length | undefined>;
     } = {},
   ): TransitionBuilder {
-    if (typeof strokeDashoffset === 'function') {
-      strokeDashoffset = strokeDashoffset(this._context);
-    } else if (typeof strokeDashoffset === 'number') {
+    if (typeof strokeDashoffset === 'number') {
       strokeDashoffset = new Length(strokeDashoffset);
     }
 
-    strokeDashoffset = ensureReactive(strokeDashoffset);
-
-    this._elements.forEach((e) => {
-      this._context.updatedValues.set(
-        e.strokeDashoffset,
-        interpolation(
-          e.strokeDashoffset.unwrap(),
-          strokeDashoffset,
-          easing(this._context.progress),
-        ),
-      );
-    });
-
-    return this;
+    return this._plainHelper(
+      strokeDashoffset,
+      { easing, interpolation },
+      (element) => element.strokeDashoffset,
+    );
   }
 
   /**
@@ -618,11 +480,7 @@ export class TransitionBuilder {
    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/visibility
    */
   public visibility(
-    visibility:
-      | RequestFunction<Visibility | undefined>
-      | ReactiveValue<Visibility | undefined>
-      | Visibility
-      | undefined,
+    visibility: RequestObject<Visibility | undefined> | Visibility | undefined,
     {
       easing = easeInOutCubic,
       interpolation = interpolateDiscrete,
@@ -631,45 +489,27 @@ export class TransitionBuilder {
       interpolation?: Interpolation<Visibility | undefined>;
     } = {},
   ): TransitionBuilder {
-    if (typeof visibility === 'function') {
-      visibility = visibility(this._context);
-    }
-
-    visibility = ensureReactive(visibility);
-
-    this._elements.forEach((e) => {
-      this._context.updatedValues.set(
-        e.visibility,
-        interpolation(
-          e.visibility.unwrap(),
-          visibility,
-          easing(this._context.progress),
-        ),
-      );
-    });
-
-    return this;
+    return this._plainHelper(
+      visibility,
+      { easing, interpolation },
+      (element) => element.visibility,
+    );
   }
 
   public shape(
-    shape:
-      | RequestFunction<Shape | undefined>
-      | ReactiveValue<Shape | undefined>
-      | Shape
-      | undefined,
+    shape: RequestObject<Shape | undefined> | Shape | undefined,
     {
       easing = easeInOutCubic,
     }: {
       easing?: Easing;
     } = {},
   ): TransitionBuilder {
-    if (typeof shape === 'function') {
-      shape = shape(this._context);
-    }
+    const parsed =
+      shape instanceof RequestObject
+        ? shape.getReactiveValue(this._context)
+        : new PrimitiveReactiveValue(shape);
 
-    shape = ensureReactive(shape);
-
-    const interpolator = interpolateToShape(shape);
+    const interpolator = interpolateToShape(parsed);
     const progress = easing(this._context.progress);
 
     this._elements.forEach((e) => {
@@ -821,6 +661,43 @@ export class TransitionBuilder {
       this._context.updatedValues.set(
         element.shape,
         interpolateToShape(ensureReactive(cubicBezier))(
+          element.shape.unwrap(),
+          progress,
+        ),
+      );
+    });
+
+    return this;
+  }
+
+  public containerShape(
+    containerShape?: (
+      containerShapeTransitionBuilder: ContainerShapeTransitionBuilder,
+    ) => void,
+    {
+      easing = easeLinear,
+    }: {
+      easing?: Easing;
+    } = {},
+  ): TransitionBuilder {
+    const updatedShapes = new Map<GeometryElement, ContainerShape>();
+
+    const containerShapeBuilder = new ContainerShapeTransitionBuilder({
+      context: this._context,
+      elements: this._elements,
+      updatedShapes,
+    });
+
+    if (containerShape) {
+      containerShape(containerShapeBuilder);
+    }
+
+    const progress = easing(this._context.progress);
+
+    updatedShapes.forEach((containerShape, element) => {
+      this._context.updatedValues.set(
+        element.shape,
+        interpolateToShape(ensureReactive(containerShape))(
           element.shape.unwrap(),
           progress,
         ),

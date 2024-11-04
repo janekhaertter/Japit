@@ -6,11 +6,11 @@ import {
   interpolateLength,
 } from 'lib/interpolation';
 import {
-  ReactiveValue,
-  ensureReactive,
+  PrimitiveReactiveValue,
+  SimpleWrappedReactiveValue,
   positionToCoordinates,
 } from 'lib/reactive-values';
-import { Context, RequestFunction } from 'lib/request-functions';
+import { Context, RequestObject } from 'lib/request-object';
 
 import { Circle } from './circle';
 import { GeometryElement } from './geometry-element';
@@ -47,6 +47,36 @@ export class CircleShapeTransitionBuilder {
     });
   }
 
+  private _plainHelper<T extends Exclude<any, RequestObject<any>>>(
+    arg: RequestObject<T> | T,
+    {
+      easing,
+      interpolation,
+    }: {
+      easing: Easing;
+      interpolation: Interpolation<T>;
+    },
+    valueExtractor: (circle: Circle) => SimpleWrappedReactiveValue<T>,
+    oldValueExtractor: (
+      element: GeometryElement,
+    ) => SimpleWrappedReactiveValue<T>,
+  ): CircleShapeTransitionBuilder {
+    const parsed =
+      arg instanceof RequestObject
+        ? arg.getReactiveValue(this._context)
+        : new PrimitiveReactiveValue(arg);
+
+    const progress = easing(this._context.progress);
+
+    this._elements.forEach((element) => {
+      valueExtractor(this._updatedShapes.get(element)!).wrap(
+        interpolation(oldValueExtractor(element).unwrap(), parsed, progress),
+      );
+    });
+
+    return this;
+  }
+
   /**
    * Transitions the x-coordinate of the centers the circles.
    * @param centerX - The x-coordinate to transition to.
@@ -57,8 +87,7 @@ export class CircleShapeTransitionBuilder {
    */
   public centerX(
     centerX:
-      | RequestFunction<Coordinate | undefined>
-      | ReactiveValue<Coordinate | undefined>
+      | RequestObject<Coordinate | undefined>
       | Coordinate
       | undefined
       | number,
@@ -70,25 +99,16 @@ export class CircleShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): CircleShapeTransitionBuilder {
-    if (typeof centerX === 'function') {
-      centerX = centerX(this._context);
-    } else if (typeof centerX === 'number') {
+    if (typeof centerX === 'number') {
       centerX = new Coordinate(centerX);
     }
 
-    centerX = ensureReactive(centerX);
-
-    const progress = easing(this._context.progress);
-
-    this._elements.forEach((element) => {
-      this._updatedShapes
-        .get(element)!
-        .cx.wrap(
-          interpolation(element.getCenterX().unwrap(), centerX, progress),
-        );
-    });
-
-    return this;
+    return this._plainHelper(
+      centerX,
+      { easing, interpolation },
+      (circle) => circle.cx,
+      (element) => element.getCenterX(),
+    );
   }
 
   /**
@@ -101,8 +121,7 @@ export class CircleShapeTransitionBuilder {
    */
   public centerY(
     centerY:
-      | RequestFunction<Coordinate | undefined>
-      | ReactiveValue<Coordinate | undefined>
+      | RequestObject<Coordinate | undefined>
       | Coordinate
       | undefined
       | number,
@@ -114,25 +133,16 @@ export class CircleShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): CircleShapeTransitionBuilder {
-    if (typeof centerY === 'function') {
-      centerY = centerY(this._context);
-    } else if (typeof centerY === 'number') {
+    if (typeof centerY === 'number') {
       centerY = new Coordinate(centerY);
     }
 
-    centerY = ensureReactive(centerY);
-
-    const progress = easing(this._context.progress);
-
-    this._elements.forEach((element) => {
-      this._updatedShapes
-        .get(element)!
-        .cy.wrap(
-          interpolation(element.getCenterY().unwrap(), centerY, progress),
-        );
-    });
-
-    return this;
+    return this._plainHelper(
+      centerY,
+      { easing, interpolation },
+      (circle) => circle.cy,
+      (element) => element.getCenterY(),
+    );
   }
 
   /**
@@ -143,11 +153,7 @@ export class CircleShapeTransitionBuilder {
    * @returns The current CircleShapeBuilder instance.
    */
   public center(
-    center:
-      | RequestFunction<Position | undefined>
-      | ReactiveValue<Position | undefined>
-      | Position
-      | undefined,
+    center: RequestObject<Position | undefined> | Position | undefined,
     {
       easing = easeJumpToEnd,
       interpolation = interpolateCoordinate,
@@ -156,13 +162,12 @@ export class CircleShapeTransitionBuilder {
       interpolation?: Interpolation<Coordinate | undefined>;
     } = {},
   ): CircleShapeTransitionBuilder {
-    if (typeof center === 'function') {
-      center = center(this._context);
-    }
+    const parsed =
+      center instanceof RequestObject
+        ? center.getReactiveValue(this._context)
+        : new PrimitiveReactiveValue(center);
 
-    center = ensureReactive(center);
-
-    const { x, y } = positionToCoordinates(center);
+    const { x, y } = positionToCoordinates(parsed);
 
     this.centerX(x, { easing, interpolation });
     this.centerY(y, { easing, interpolation });
@@ -179,12 +184,7 @@ export class CircleShapeTransitionBuilder {
    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/r
    */
   public radius(
-    radius:
-      | RequestFunction<Length | undefined>
-      | ReactiveValue<Length | undefined>
-      | Length
-      | undefined
-      | number,
+    radius: RequestObject<Length | undefined> | Length | undefined | number,
     {
       easing = easeJumpToEnd,
       interpolation = interpolateLength,
@@ -193,22 +193,15 @@ export class CircleShapeTransitionBuilder {
       interpolation?: Interpolation<Length | undefined>;
     } = {},
   ): CircleShapeTransitionBuilder {
-    if (typeof radius === 'function') {
-      radius = radius(this._context);
-    } else if (typeof radius === 'number') {
+    if (typeof radius === 'number') {
       radius = new Length(radius);
     }
 
-    radius = ensureReactive(radius);
-
-    const progress = easing(this._context.progress);
-
-    this._elements.forEach((element) => {
-      this._updatedShapes
-        .get(element)!
-        .r.wrap(interpolation(element.getRadius().unwrap(), radius, progress));
-    });
-
-    return this;
+    return this._plainHelper(
+      radius,
+      { easing, interpolation },
+      (circle) => circle.r,
+      (element) => element.getRadius(),
+    );
   }
 }
