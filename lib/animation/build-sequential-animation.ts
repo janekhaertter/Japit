@@ -9,6 +9,7 @@ import { Animatable } from './animatable';
 import { AnimationBuilder } from './animation-builder';
 import { buildParallelAnimation } from './build-parallel-animation';
 import { GeometryElementManager } from './geometry-element-manager';
+import { Identifier } from './identifier';
 import { UpdatedValuesMap } from './updated-values-map';
 
 export function buildSequentialAnimation({
@@ -22,11 +23,13 @@ export function buildSequentialAnimation({
 }): {
   progress: SimpleWrappedReactiveValue<AlphaValue>;
   duration: number;
+  marks: Map<Identifier, AlphaValue>;
 } {
   // First build all animations
   const animations: {
     progress: SimpleWrappedReactiveValue<AlphaValue>;
     duration: number;
+    marks: Map<Identifier, AlphaValue>;
   }[] = [];
 
   for (const animatable of animatables) {
@@ -67,6 +70,8 @@ export function buildSequentialAnimation({
     ensureReactive(new AlphaValue(1)),
   );
 
+  const marks: Map<Identifier, AlphaValue> = new Map();
+
   let currentDuration = 0;
   for (const animation of animations) {
     const startTime = currentDuration;
@@ -82,11 +87,31 @@ export function buildSequentialAnimation({
         return new AlphaValue(newProgress);
       }),
     );
+    animation.marks.forEach((value, key) => {
+      console.log({
+        value: value.getNumber(),
+        key,
+        totalDuration,
+        currentDuration,
+        duration: animation.duration,
+        newValue:
+          (currentDuration + animation.duration * value.getNumber()) /
+          totalDuration,
+      });
+      marks.set(
+        key,
+        new AlphaValue(
+          (currentDuration + animation.duration * value.getNumber()) /
+            totalDuration,
+        ),
+      );
+    });
     currentDuration += animation.duration;
   }
 
   return {
     progress,
     duration: totalDuration,
+    marks,
   };
 }

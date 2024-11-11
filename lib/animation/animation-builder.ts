@@ -5,7 +5,7 @@ import {
   SimpleWrappedReactiveValue,
   ensureReactive,
 } from 'lib/reactive-values';
-import { Context } from 'lib/request-functions';
+import { Context } from 'lib/request-object';
 
 import { GeometryElementManager } from './geometry-element-manager';
 import { Identifier } from './identifier';
@@ -16,6 +16,8 @@ import { UpdatedValuesMap } from './updated-values-map';
 export class AnimationBuilder {
   private _duration: number = 0;
   private _context: Context;
+
+  private _marks: Map<Identifier, AlphaValue> = new Map();
 
   constructor({
     geometryElementManager,
@@ -41,9 +43,22 @@ export class AnimationBuilder {
     this._duration = duration;
   }
 
+  public markStart(id: Identifier): void {
+    this.markAt(new AlphaValue(0), id);
+  }
+
+  public markEnd(id: Identifier): void {
+    this.markAt(new AlphaValue(1), id);
+  }
+
+  public markAt(progress: AlphaValue, id: Identifier): void {
+    this._marks.set(id, progress);
+  }
+
   public build(): {
     progress: SimpleWrappedReactiveValue<AlphaValue>;
     duration: number;
+    marks: Map<Identifier, AlphaValue>;
   } {
     this._context.oldUpdatedValues.clear();
     this._context.updatedValues.forEach((value, key) => {
@@ -53,6 +68,7 @@ export class AnimationBuilder {
     return {
       duration: this._duration,
       progress: this._context.progress,
+      marks: this._marks,
     };
   }
 

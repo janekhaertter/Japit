@@ -8,6 +8,7 @@ import {
 import { Animatable } from './animatable';
 import { buildSequentialAnimation } from './build-sequential-animation';
 import { GeometryElementManager } from './geometry-element-manager';
+import { Identifier } from './identifier';
 import { UpdatedValuesMap } from './updated-values-map';
 
 export function buildParallelAnimation({
@@ -21,10 +22,12 @@ export function buildParallelAnimation({
 }): {
   progress: SimpleWrappedReactiveValue<AlphaValue>;
   duration: number;
+  marks: Map<Identifier, AlphaValue>;
 } {
   const animations: {
     progress: SimpleWrappedReactiveValue<AlphaValue>;
     duration: number;
+    marks: Map<Identifier, AlphaValue>;
   }[] = [];
   let maxDuration = 0;
 
@@ -42,6 +45,8 @@ export function buildParallelAnimation({
     maxDuration = Math.max(maxDuration, animation.duration);
   }
 
+  const marks: Map<Identifier, AlphaValue> = new Map();
+
   for (const animation of animations) {
     const duration = animation.duration;
     const animationProgress = new FunctionalReactiveValue(
@@ -54,10 +59,17 @@ export function buildParallelAnimation({
       },
     );
     animation.progress.wrap(animationProgress);
+    animation.marks.forEach((value, key) => {
+      marks.set(
+        key,
+        new AlphaValue((value.getNumber() * animation.duration) / maxDuration),
+      );
+    });
   }
 
   return {
     progress,
     duration: maxDuration,
+    marks,
   };
 }

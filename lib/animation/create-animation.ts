@@ -1,3 +1,4 @@
+import { AlphaValue } from 'lib/data-types';
 import { Drawing } from 'lib/drawing/drawing';
 
 import { Animatable } from './animatable';
@@ -30,8 +31,9 @@ export function createAnimation(
     duration: animation.duration,
     progress: animation.progress,
     drawing,
+    marks: animation.marks,
   });
-  player.seek(0);
+  player.seekProgress(new AlphaValue(0));
 
   return player;
 }
