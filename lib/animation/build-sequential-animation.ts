@@ -88,16 +88,6 @@ export function buildSequentialAnimation({
       }),
     );
     animation.marks.forEach((value, key) => {
-      console.log({
-        value: value.getNumber(),
-        key,
-        totalDuration,
-        currentDuration,
-        duration: animation.duration,
-        newValue:
-          (currentDuration + animation.duration * value.getNumber()) /
-          totalDuration,
-      });
       marks.set(
         key,
         new AlphaValue(
