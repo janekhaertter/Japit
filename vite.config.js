@@ -17,7 +17,14 @@ export default defineConfig({
       output: {},
     },
   },
-  plugins: [tsconfigPaths(), dts({ include: ['lib'] }), eslint()],
+  plugins: [
+    tsconfigPaths(),
+    dts({
+      include: ['lib'],
+      insertTypesEntry: true,
+    }),
+    eslint(),
+  ],
   resolve: {
     alias: {
       src: resolve(__dirname, 'src'),
