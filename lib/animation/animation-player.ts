@@ -69,7 +69,7 @@ export class AnimationPlayer {
     to,
     progress,
     mark,
-    direction = PlaybackDirection.Forward,
+    direction,
     playbackRate = 1,
   }: {
     to?: number;
@@ -95,7 +95,7 @@ export class AnimationPlayer {
     }
 
     // compute target time
-    let targetTime = direction === PlaybackDirection.Backward ? 0 : 1;
+    let targetTime = undefined;
 
     if (to !== undefined) {
       targetTime = this.normalizedTime(to);
@@ -107,6 +107,15 @@ export class AnimationPlayer {
         throw new Error(`No mark with identifier ${String(mark)}`);
       }
       targetTime = markValue.getNumber();
+    } else {
+      targetTime = direction === PlaybackDirection.Backward ? 0 : 1;
+    }
+
+    if (direction === undefined) {
+      direction =
+        targetTime > this._progress.getValue().getNumber()
+          ? PlaybackDirection.Forward
+          : PlaybackDirection.Backward;
     }
 
     if (playbackRate <= 0) {
