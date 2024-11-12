@@ -1,12 +1,9 @@
 import { AlphaValue, Coordinate, Length } from 'lib/data-types';
 import {
-  Circle,
-  CircleShapeTransition,
   EmptyShape,
   Line,
   LineShapeTransition,
   Rectangle,
-  RectangleShapeTransition,
   Shape,
 } from 'lib/geometry-elements';
 import { CubicBezier } from 'lib/geometry-elements/cubic-bezier';
@@ -276,127 +273,127 @@ export function interpolateToShape(
   };
 }
 
-export function interpolateToCircle(
-  circleShapeTransition: CircleShapeTransition,
-): Interpolation<Shape> {
-  const targetCircle = new Circle();
-
-  if (circleShapeTransition.centerX !== undefined) {
-    targetCircle.cx.wrap(circleShapeTransition.centerX.to);
-  }
-  if (circleShapeTransition.centerY !== undefined) {
-    targetCircle.cy.wrap(circleShapeTransition.centerY.to);
-  }
-  if (circleShapeTransition.radius !== undefined) {
-    targetCircle.r.wrap(circleShapeTransition.radius.to);
-  }
-
-  return (from, _, progress) => {
-    return new FunctionalReactiveValue([from, progress], (_) => {
-      const fromValue = from.getValue();
-      const progressValue = progress.getValue().getNumber();
-
-      if (progressValue === 0) return fromValue;
-
-      if (fromValue === undefined) return targetCircle;
-
-      if (!(fromValue instanceof Circle)) return targetCircle;
-
-      const res = new Circle();
-
-      if (circleShapeTransition.centerX !== undefined) {
-        const { to, easing, interpolation } = circleShapeTransition.centerX;
-        res.cx.wrap(interpolation(fromValue.cx, to, easing(progress)));
-      }
-
-      if (circleShapeTransition.centerY !== undefined) {
-        const { to, easing, interpolation } = circleShapeTransition.centerY;
-        res.cy.wrap(interpolation(fromValue.cy, to, easing(progress)));
-      }
-
-      if (circleShapeTransition.radius !== undefined) {
-        const { to, easing, interpolation } = circleShapeTransition.radius;
-        res.r.wrap(interpolation(fromValue.r, to, easing(progress)));
-      }
-
-      return res;
-    });
-  };
-}
-
-export function interpolateToRectangle(
-  rectangleShapeTransition: RectangleShapeTransition,
-): Interpolation<Shape> {
-  const targetRectangle = new Rectangle();
-
-  if (rectangleShapeTransition.x !== undefined) {
-    targetRectangle.x.wrap(rectangleShapeTransition.x.to);
-  }
-  if (rectangleShapeTransition.y !== undefined) {
-    targetRectangle.y.wrap(rectangleShapeTransition.y.to);
-  }
-  if (rectangleShapeTransition.width !== undefined) {
-    targetRectangle.width.wrap(rectangleShapeTransition.width.to);
-  }
-  if (rectangleShapeTransition.height !== undefined) {
-    targetRectangle.height.wrap(rectangleShapeTransition.height.to);
-  }
-  if (rectangleShapeTransition.cornerRadiusX !== undefined) {
-    targetRectangle.rx.wrap(rectangleShapeTransition.cornerRadiusX.to);
-  }
-  if (rectangleShapeTransition.cornerRadiusY !== undefined) {
-    targetRectangle.ry.wrap(rectangleShapeTransition.cornerRadiusY.to);
-  }
-
-  return (from, _, progress) => {
-    return new FunctionalReactiveValue([from, progress], (_) => {
-      const fromValue = from.getValue();
-      const progressValue = progress.getValue().getNumber();
-
-      if (progressValue === 0) return fromValue;
-
-      if (fromValue === undefined) return targetRectangle;
-
-      if (!(fromValue instanceof Rectangle)) return targetRectangle;
-
-      const res = new Rectangle();
-
-      if (rectangleShapeTransition.x !== undefined) {
-        const { to, easing, interpolation } = rectangleShapeTransition.x;
-        res.x.wrap(interpolation(fromValue.x, to, easing(progress)));
-      }
-
-      if (rectangleShapeTransition.y !== undefined) {
-        const { to, easing, interpolation } = rectangleShapeTransition.y;
-        res.y.wrap(interpolation(fromValue.y, to, easing(progress)));
-      }
-
-      if (rectangleShapeTransition.width !== undefined) {
-        const { to, easing, interpolation } = rectangleShapeTransition.width;
-        res.width.wrap(interpolation(fromValue.width, to, easing(progress)));
-      }
-
-      if (rectangleShapeTransition.height !== undefined) {
-        const { to, easing, interpolation } = rectangleShapeTransition.height;
-        res.height.wrap(interpolation(fromValue.height, to, easing(progress)));
-      }
-
-      if (rectangleShapeTransition.cornerRadiusX !== undefined) {
-        const { to, easing, interpolation } =
-          rectangleShapeTransition.cornerRadiusX;
-        res.rx.wrap(interpolation(fromValue.rx, to, easing(progress)));
-      }
-
-      if (rectangleShapeTransition.cornerRadiusY !== undefined) {
-        const { to, easing, interpolation } =
-          rectangleShapeTransition.cornerRadiusY;
-        res.ry.wrap(interpolation(fromValue.ry, to, easing(progress)));
-      }
-
-      return res;
-    });
-  };
-}
+//export function interpolateToCircle(
+//  circleShapeTransition: CircleShapeTransition,
+//): Interpolation<Shape> {
+//  const targetCircle = new Circle();
+//
+//  if (circleShapeTransition.centerX !== undefined) {
+//    targetCircle.cx.wrap(circleShapeTransition.centerX.to);
+//  }
+//  if (circleShapeTransition.centerY !== undefined) {
+//    targetCircle.cy.wrap(circleShapeTransition.centerY.to);
+//  }
+//  if (circleShapeTransition.radius !== undefined) {
+//    targetCircle.r.wrap(circleShapeTransition.radius.to);
+//  }
+//
+//  return (from, _, progress) => {
+//    return new FunctionalReactiveValue([from, progress], (_) => {
+//      const fromValue = from.getValue();
+//      const progressValue = progress.getValue().getNumber();
+//
+//      if (progressValue === 0) return fromValue;
+//
+//      if (fromValue === undefined) return targetCircle;
+//
+//      if (!(fromValue instanceof Circle)) return targetCircle;
+//
+//      const res = new Circle();
+//
+//      if (circleShapeTransition.centerX !== undefined) {
+//        const { to, easing, interpolation } = circleShapeTransition.centerX;
+//        res.cx.wrap(interpolation(fromValue.cx, to, easing(progress)));
+//      }
+//
+//      if (circleShapeTransition.centerY !== undefined) {
+//        const { to, easing, interpolation } = circleShapeTransition.centerY;
+//        res.cy.wrap(interpolation(fromValue.cy, to, easing(progress)));
+//      }
+//
+//      if (circleShapeTransition.radius !== undefined) {
+//        const { to, easing, interpolation } = circleShapeTransition.radius;
+//        res.r.wrap(interpolation(fromValue.r, to, easing(progress)));
+//      }
+//
+//      return res;
+//    });
+//  };
+//}
+//
+//export function interpolateToRectangle(
+//  rectangleShapeTransition: RectangleShapeTransition,
+//): Interpolation<Shape> {
+//  const targetRectangle = new Rectangle();
+//
+//  if (rectangleShapeTransition.x !== undefined) {
+//    targetRectangle.x.wrap(rectangleShapeTransition.x.to);
+//  }
+//  if (rectangleShapeTransition.y !== undefined) {
+//    targetRectangle.y.wrap(rectangleShapeTransition.y.to);
+//  }
+//  if (rectangleShapeTransition.width !== undefined) {
+//    targetRectangle.width.wrap(rectangleShapeTransition.width.to);
+//  }
+//  if (rectangleShapeTransition.height !== undefined) {
+//    targetRectangle.height.wrap(rectangleShapeTransition.height.to);
+//  }
+//  if (rectangleShapeTransition.cornerRadiusX !== undefined) {
+//    targetRectangle.rx.wrap(rectangleShapeTransition.cornerRadiusX.to);
+//  }
+//  if (rectangleShapeTransition.cornerRadiusY !== undefined) {
+//    targetRectangle.ry.wrap(rectangleShapeTransition.cornerRadiusY.to);
+//  }
+//
+//  return (from, _, progress) => {
+//    return new FunctionalReactiveValue([from, progress], (_) => {
+//      const fromValue = from.getValue();
+//      const progressValue = progress.getValue().getNumber();
+//
+//      if (progressValue === 0) return fromValue;
+//
+//      if (fromValue === undefined) return targetRectangle;
+//
+//      if (!(fromValue instanceof Rectangle)) return targetRectangle;
+//
+//      const res = new Rectangle();
+//
+//      if (rectangleShapeTransition.x !== undefined) {
+//        const { to, easing, interpolation } = rectangleShapeTransition.x;
+//        res.x.wrap(interpolation(fromValue.x, to, easing(progress)));
+//      }
+//
+//      if (rectangleShapeTransition.y !== undefined) {
+//        const { to, easing, interpolation } = rectangleShapeTransition.y;
+//        res.y.wrap(interpolation(fromValue.y, to, easing(progress)));
+//      }
+//
+//      if (rectangleShapeTransition.width !== undefined) {
+//        const { to, easing, interpolation } = rectangleShapeTransition.width;
+//        res.width.wrap(interpolation(fromValue.width, to, easing(progress)));
+//      }
+//
+//      if (rectangleShapeTransition.height !== undefined) {
+//        const { to, easing, interpolation } = rectangleShapeTransition.height;
+//        res.height.wrap(interpolation(fromValue.height, to, easing(progress)));
+//      }
+//
+//      if (rectangleShapeTransition.cornerRadiusX !== undefined) {
+//        const { to, easing, interpolation } =
+//          rectangleShapeTransition.cornerRadiusX;
+//        res.rx.wrap(interpolation(fromValue.rx, to, easing(progress)));
+//      }
+//
+//      if (rectangleShapeTransition.cornerRadiusY !== undefined) {
+//        const { to, easing, interpolation } =
+//          rectangleShapeTransition.cornerRadiusY;
+//        res.ry.wrap(interpolation(fromValue.ry, to, easing(progress)));
+//      }
+//
+//      return res;
+//    });
+//  };
+//}
 //
 //export function interpolateShape(
 //  from: ReactiveValue<Shape | undefined>,

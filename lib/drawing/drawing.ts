@@ -2,7 +2,7 @@ import { GeometryElement } from 'lib/geometry-elements';
 
 export class Drawing {
   public svg: SVGSVGElement;
-  protected _geometryElements = new Set<GeometryElement<SVGGeometryElement>>();
+  protected _geometryElements = new Set<GeometryElement>();
 
   constructor(svg?: SVGSVGElement) {
     this.svg =
@@ -11,8 +11,8 @@ export class Drawing {
 
   public addGeometryElements(
     geometryElement:
-      | GeometryElement<SVGGeometryElement>
-      | Iterable<GeometryElement<SVGGeometryElement>>,
+      | GeometryElement
+      | Iterable<GeometryElement>,
   ): void {
     if (geometryElement instanceof GeometryElement) {
       return this.addGeometryElements([geometryElement]);
@@ -24,8 +24,8 @@ export class Drawing {
 
   public deleteGeometryElements(
     geometryElement:
-      | GeometryElement<SVGGeometryElement>
-      | Iterable<GeometryElement<SVGGeometryElement>>,
+      | GeometryElement
+      | Iterable<GeometryElement>,
   ): void {
     if (geometryElement instanceof GeometryElement) {
       return this.deleteGeometryElements([geometryElement]);

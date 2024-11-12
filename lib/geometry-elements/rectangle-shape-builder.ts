@@ -6,7 +6,10 @@ import {
   interpolateCoordinate,
   interpolateLength,
 } from 'lib/interpolation';
-import { PrimitiveReactiveValue } from 'lib/reactive-values';
+import {
+  PrimitiveReactiveValue,
+  SimpleWrappedReactiveValue,
+} from 'lib/reactive-values';
 import { Context, RequestObject } from 'lib/request-object';
 
 import { GeometryElement } from './geometry-element';
