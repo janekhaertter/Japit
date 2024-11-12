@@ -36,6 +36,10 @@ export class AnimationPlayer {
     this._marks = marks;
   }
 
+  get marks(): Map<Identifier, AlphaValue> {
+    return this._marks;
+  }
+
   private normalizedTime(absoluteTime: number): number {
     return absoluteTime / this._duration;
   }
