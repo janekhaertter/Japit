@@ -1,6 +1,5 @@
 export * from './animatable';
 export * from './animation-builder';
-export * from './animation-player';
 
 export * from './create-animation';
 export * from './build-parallel-animation';

@@ -21,7 +21,7 @@ import {
 
 import { EmptyShape } from './empty-shape';
 import { Shape } from './shape';
-import { svgNamespace } from './svg-namespace';
+import { SVG_NAMESPACE } from './svg-namespace';
 
 // alignment-baseline, baseline-shift, direction, text-anchor, text-decoration, text-overflow, text-rendering, word-spacing (best to look at spec again): RTL (text)
 // fill-rule: path and such
@@ -29,7 +29,7 @@ import { svgNamespace } from './svg-namespace';
 
 export class GeometryElement {
   protected _domElement: SVGGElement = document.createElementNS(
-    svgNamespace,
+    SVG_NAMESPACE,
     'g',
   );
 

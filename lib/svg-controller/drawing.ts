@@ -1,18 +1,16 @@
 import { GeometryElement } from 'lib/geometry-elements';
+import { SVG_NAMESPACE } from 'lib/geometry-elements';
 
 export class Drawing {
   public svg: SVGSVGElement;
   protected _geometryElements = new Set<GeometryElement>();
 
   constructor(svg?: SVGSVGElement) {
-    this.svg =
-      svg ?? document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    this.svg = svg ?? document.createElementNS(SVG_NAMESPACE, 'svg');
   }
 
   public addGeometryElements(
-    geometryElement:
-      | GeometryElement
-      | Iterable<GeometryElement>,
+    geometryElement: GeometryElement | Iterable<GeometryElement>,
   ): void {
     if (geometryElement instanceof GeometryElement) {
       return this.addGeometryElements([geometryElement]);
@@ -23,9 +21,7 @@ export class Drawing {
   }
 
   public deleteGeometryElements(
-    geometryElement:
-      | GeometryElement
-      | Iterable<GeometryElement>,
+    geometryElement: GeometryElement | Iterable<GeometryElement>,
   ): void {
     if (geometryElement instanceof GeometryElement) {
       return this.deleteGeometryElements([geometryElement]);

@@ -6,11 +6,11 @@ import {
 } from 'lib/reactive-values';
 
 import { Shape } from './shape';
-import { svgNamespace } from './svg-namespace';
+import { SVG_NAMESPACE } from './svg-namespace';
 
 export class ContainerShape extends Shape {
   private _domElement: SVGSVGElement = document.createElementNS(
-    svgNamespace,
+    SVG_NAMESPACE,
     'svg',
   ) as SVGSVGElement;
 

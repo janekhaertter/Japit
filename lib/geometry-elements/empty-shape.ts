@@ -1,9 +1,9 @@
 import { Shape } from './shape';
-import { svgNamespace } from './svg-namespace';
+import { SVG_NAMESPACE } from './svg-namespace';
 
 export class EmptyShape extends Shape {
   private _domElement: SVGGElement = document.createElementNS(
-    svgNamespace,
+    SVG_NAMESPACE,
     'g',
   ) as SVGGElement;
 

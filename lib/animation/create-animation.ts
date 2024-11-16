@@ -1,8 +1,9 @@
+import { AnimationPlayer } from '../svg-controller/animation-player';
+
 import { AlphaValue } from 'lib/data-types';
-import { Drawing } from 'lib/drawing/drawing';
+import { Drawing } from 'lib/svg-controller/drawing';
 
 import { Animatable } from './animatable';
-import { AnimationPlayer } from './animation-player';
 import { buildSequentialAnimation } from './build-sequential-animation';
 import { GeometryElementManager } from './geometry-element-manager';
 import { UpdatedValuesMap } from './updated-values-map';

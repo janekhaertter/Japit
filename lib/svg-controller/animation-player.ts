@@ -1,11 +1,11 @@
+import { Identifier } from '../animation/identifier';
+
 import { AlphaValue } from 'lib/data-types';
-import { Drawing } from 'lib/drawing/drawing';
 import {
   PrimitiveReactiveValue,
   SimpleWrappedReactiveValue,
 } from 'lib/reactive-values';
-
-import { Identifier } from './identifier';
+import { Drawing } from 'lib/svg-controller/drawing';
 
 export enum PlaybackDirection {
   Forward = 1,

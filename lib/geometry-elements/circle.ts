@@ -9,11 +9,11 @@ import {
 import { Ellipse } from './elipse';
 import { Rectangle } from './rectangle';
 import { Shape } from './shape';
-import { svgNamespace } from './svg-namespace';
+import { SVG_NAMESPACE } from './svg-namespace';
 
 export class Circle extends Shape {
   protected _domElement = document.createElementNS(
-    svgNamespace,
+    SVG_NAMESPACE,
     'circle',
   ) as SVGCircleElement;
 

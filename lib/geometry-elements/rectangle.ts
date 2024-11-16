@@ -7,11 +7,11 @@ import {
 } from 'lib/reactive-values';
 
 import { Shape } from './shape';
-import { svgNamespace } from './svg-namespace';
+import { SVG_NAMESPACE } from './svg-namespace';
 
 export class Rectangle extends Shape {
   protected _domElement = document.createElementNS(
-    svgNamespace,
+    SVG_NAMESPACE,
     'rect',
   ) as SVGRectElement;
 
