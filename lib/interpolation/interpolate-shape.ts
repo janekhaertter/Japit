@@ -1,172 +1,162 @@
 import { AlphaValue, Coordinate, Length } from 'lib/data-types';
-import {
-  EmptyShape,
-  Line,
-  LineShapeTransition,
-  Rectangle,
-  Shape,
-} from 'lib/geometry-elements';
-import { CubicBezier } from 'lib/geometry-elements/cubic-bezier';
-import { CubicBezierShapeTransition } from 'lib/geometry-elements/cubic-bezier-shape-builder';
+import { Rectangle, Shape } from 'lib/geometry-elements';
 import { FunctionalReactiveValue, ReactiveValue } from 'lib/reactive-values';
 
-import { Interpolation } from './interpolation';
-
-export function interpolateToLine(
-  lineShapeTransition: LineShapeTransition,
-): Interpolation<Shape> {
-  const targetLine = new Line();
-
-  if (lineShapeTransition.startX !== undefined) {
-    targetLine.x1.wrap(lineShapeTransition.startX.to);
-  }
-  if (lineShapeTransition.startY !== undefined) {
-    targetLine.y1.wrap(lineShapeTransition.startY.to);
-  }
-  if (lineShapeTransition.endX !== undefined) {
-    targetLine.x2.wrap(lineShapeTransition.endX.to);
-  }
-  if (lineShapeTransition.endY !== undefined) {
-    targetLine.y2.wrap(lineShapeTransition.endY.to);
-  }
-
-  return (from, _, progress) => {
-    return new FunctionalReactiveValue([from, progress], (_) => {
-      const fromValue = from.getValue();
-      const progressValue = progress.getValue().getNumber();
-
-      if (progressValue === 0) return fromValue;
-
-      if (fromValue === undefined) return targetLine;
-
-      if (!(fromValue instanceof Line)) return targetLine;
-
-      const res = new Line();
-
-      if (lineShapeTransition.startX !== undefined) {
-        const { to, easing, interpolation } = lineShapeTransition.startX;
-        res.x1.wrap(interpolation(fromValue.x1, to, easing(progress)));
-      }
-
-      if (lineShapeTransition.startY !== undefined) {
-        const { to, easing, interpolation } = lineShapeTransition.startY;
-        res.y1.wrap(interpolation(fromValue.y1, to, easing(progress)));
-      }
-
-      if (lineShapeTransition.endX !== undefined) {
-        const { to, easing, interpolation } = lineShapeTransition.endX;
-        res.x2.wrap(interpolation(fromValue.x2, to, easing(progress)));
-      }
-
-      if (lineShapeTransition.endY !== undefined) {
-        const { to, easing, interpolation } = lineShapeTransition.endY;
-        res.y2.wrap(interpolation(fromValue.y2, to, easing(progress)));
-      }
-
-      return res;
-    });
-  };
-}
-
-export function interpolateToCubicBezier(
-  cubicBezierShapeTransition: CubicBezierShapeTransition,
-): Interpolation<Shape> {
-  const targetCubicBezier = new CubicBezier();
-
-  if (cubicBezierShapeTransition.startX !== undefined) {
-    targetCubicBezier.startX.wrap(cubicBezierShapeTransition.startX.to);
-  }
-  if (cubicBezierShapeTransition.startY !== undefined) {
-    targetCubicBezier.startY.wrap(cubicBezierShapeTransition.startY.to);
-  }
-  if (cubicBezierShapeTransition.control1X !== undefined) {
-    targetCubicBezier.control1X.wrap(cubicBezierShapeTransition.control1X.to);
-  }
-  if (cubicBezierShapeTransition.control1Y !== undefined) {
-    targetCubicBezier.control1Y.wrap(cubicBezierShapeTransition.control1Y.to);
-  }
-  if (cubicBezierShapeTransition.control2X !== undefined) {
-    targetCubicBezier.control2X.wrap(cubicBezierShapeTransition.control2X.to);
-  }
-  if (cubicBezierShapeTransition.control2Y !== undefined) {
-    targetCubicBezier.control2Y.wrap(cubicBezierShapeTransition.control2Y.to);
-  }
-  if (cubicBezierShapeTransition.endX !== undefined) {
-    targetCubicBezier.endX.wrap(cubicBezierShapeTransition.endX.to);
-  }
-  if (cubicBezierShapeTransition.endY !== undefined) {
-    targetCubicBezier.endY.wrap(cubicBezierShapeTransition.endY.to);
-  }
-
-  return (from, _, progress) => {
-    return new FunctionalReactiveValue([from, progress], (_) => {
-      const fromValue = from.getValue();
-      const progressValue = progress.getValue().getNumber();
-
-      if (progressValue === 0) return fromValue;
-
-      if (fromValue === undefined) return new EmptyShape();
-
-      if (!(fromValue instanceof CubicBezier)) return targetCubicBezier;
-
-      const res = new CubicBezier();
-
-      if (cubicBezierShapeTransition.startX !== undefined) {
-        const { to, easing, interpolation } = cubicBezierShapeTransition.startX;
-        res.startX.wrap(interpolation(fromValue.startX, to, easing(progress)));
-      }
-
-      if (cubicBezierShapeTransition.startY !== undefined) {
-        const { to, easing, interpolation } = cubicBezierShapeTransition.startY;
-        res.startY.wrap(interpolation(fromValue.startY, to, easing(progress)));
-      }
-
-      if (cubicBezierShapeTransition.control1X !== undefined) {
-        const { to, easing, interpolation } =
-          cubicBezierShapeTransition.control1X;
-        res.control1X.wrap(
-          interpolation(fromValue.control1X, to, easing(progress)),
-        );
-      }
-
-      if (cubicBezierShapeTransition.control1Y !== undefined) {
-        const { to, easing, interpolation } =
-          cubicBezierShapeTransition.control1Y;
-        res.control1Y.wrap(
-          interpolation(fromValue.control1Y, to, easing(progress)),
-        );
-      }
-
-      if (cubicBezierShapeTransition.control2X !== undefined) {
-        const { to, easing, interpolation } =
-          cubicBezierShapeTransition.control2X;
-        res.control2X.wrap(
-          interpolation(fromValue.control2X, to, easing(progress)),
-        );
-      }
-
-      if (cubicBezierShapeTransition.control2Y !== undefined) {
-        const { to, easing, interpolation } =
-          cubicBezierShapeTransition.control2Y;
-        res.control2Y.wrap(
-          interpolation(fromValue.control2Y, to, easing(progress)),
-        );
-      }
-
-      if (cubicBezierShapeTransition.endX !== undefined) {
-        const { to, easing, interpolation } = cubicBezierShapeTransition.endX;
-        res.endX.wrap(interpolation(fromValue.endX, to, easing(progress)));
-      }
-
-      if (cubicBezierShapeTransition.endY !== undefined) {
-        const { to, easing, interpolation } = cubicBezierShapeTransition.endY;
-        res.endY.wrap(interpolation(fromValue.endY, to, easing(progress)));
-      }
-
-      return res;
-    });
-  };
-}
+//export function interpolateToLine(
+//  lineShapeTransition: LineShapeTransition,
+//): Interpolation<Shape> {
+//  const targetLine = new Line();
+//
+//  if (lineShapeTransition.startX !== undefined) {
+//    targetLine.x1.wrap(lineShapeTransition.startX.to);
+//  }
+//  if (lineShapeTransition.startY !== undefined) {
+//    targetLine.y1.wrap(lineShapeTransition.startY.to);
+//  }
+//  if (lineShapeTransition.endX !== undefined) {
+//    targetLine.x2.wrap(lineShapeTransition.endX.to);
+//  }
+//  if (lineShapeTransition.endY !== undefined) {
+//    targetLine.y2.wrap(lineShapeTransition.endY.to);
+//  }
+//
+//  return (from, _, progress) => {
+//    return new FunctionalReactiveValue([from, progress], (_) => {
+//      const fromValue = from.getValue();
+//      const progressValue = progress.getValue().getNumber();
+//
+//      if (progressValue === 0) return fromValue;
+//
+//      if (fromValue === undefined) return targetLine;
+//
+//      if (!(fromValue instanceof Line)) return targetLine;
+//
+//      const res = new Line();
+//
+//      if (lineShapeTransition.startX !== undefined) {
+//        const { to, easing, interpolation } = lineShapeTransition.startX;
+//        res.x1.wrap(interpolation(fromValue.x1, to, easing(progress)));
+//      }
+//
+//      if (lineShapeTransition.startY !== undefined) {
+//        const { to, easing, interpolation } = lineShapeTransition.startY;
+//        res.y1.wrap(interpolation(fromValue.y1, to, easing(progress)));
+//      }
+//
+//      if (lineShapeTransition.endX !== undefined) {
+//        const { to, easing, interpolation } = lineShapeTransition.endX;
+//        res.x2.wrap(interpolation(fromValue.x2, to, easing(progress)));
+//      }
+//
+//      if (lineShapeTransition.endY !== undefined) {
+//        const { to, easing, interpolation } = lineShapeTransition.endY;
+//        res.y2.wrap(interpolation(fromValue.y2, to, easing(progress)));
+//      }
+//
+//      return res;
+//    });
+//  };
+//}
+//
+//export function interpolateToCubicBezier(
+//  cubicBezierShapeTransition: CubicBezierShapeTransition,
+//): Interpolation<Shape> {
+//  const targetCubicBezier = new CubicBezier();
+//
+//  if (cubicBezierShapeTransition.startX !== undefined) {
+//    targetCubicBezier.startX.wrap(cubicBezierShapeTransition.startX.to);
+//  }
+//  if (cubicBezierShapeTransition.startY !== undefined) {
+//    targetCubicBezier.startY.wrap(cubicBezierShapeTransition.startY.to);
+//  }
+//  if (cubicBezierShapeTransition.control1X !== undefined) {
+//    targetCubicBezier.control1X.wrap(cubicBezierShapeTransition.control1X.to);
+//  }
+//  if (cubicBezierShapeTransition.control1Y !== undefined) {
+//    targetCubicBezier.control1Y.wrap(cubicBezierShapeTransition.control1Y.to);
+//  }
+//  if (cubicBezierShapeTransition.control2X !== undefined) {
+//    targetCubicBezier.control2X.wrap(cubicBezierShapeTransition.control2X.to);
+//  }
+//  if (cubicBezierShapeTransition.control2Y !== undefined) {
+//    targetCubicBezier.control2Y.wrap(cubicBezierShapeTransition.control2Y.to);
+//  }
+//  if (cubicBezierShapeTransition.endX !== undefined) {
+//    targetCubicBezier.endX.wrap(cubicBezierShapeTransition.endX.to);
+//  }
+//  if (cubicBezierShapeTransition.endY !== undefined) {
+//    targetCubicBezier.endY.wrap(cubicBezierShapeTransition.endY.to);
+//  }
+//
+//  return (from, _, progress) => {
+//    return new FunctionalReactiveValue([from, progress], (_) => {
+//      const fromValue = from.getValue();
+//      const progressValue = progress.getValue().getNumber();
+//
+//      if (progressValue === 0) return fromValue;
+//
+//      if (fromValue === undefined) return new EmptyShape();
+//
+//      if (!(fromValue instanceof CubicBezier)) return targetCubicBezier;
+//
+//      const res = new CubicBezier();
+//
+//      if (cubicBezierShapeTransition.startX !== undefined) {
+//        const { to, easing, interpolation } = cubicBezierShapeTransition.startX;
+//        res.startX.wrap(interpolation(fromValue.startX, to, easing(progress)));
+//      }
+//
+//      if (cubicBezierShapeTransition.startY !== undefined) {
+//        const { to, easing, interpolation } = cubicBezierShapeTransition.startY;
+//        res.startY.wrap(interpolation(fromValue.startY, to, easing(progress)));
+//      }
+//
+//      if (cubicBezierShapeTransition.control1X !== undefined) {
+//        const { to, easing, interpolation } =
+//          cubicBezierShapeTransition.control1X;
+//        res.control1X.wrap(
+//          interpolation(fromValue.control1X, to, easing(progress)),
+//        );
+//      }
+//
+//      if (cubicBezierShapeTransition.control1Y !== undefined) {
+//        const { to, easing, interpolation } =
+//          cubicBezierShapeTransition.control1Y;
+//        res.control1Y.wrap(
+//          interpolation(fromValue.control1Y, to, easing(progress)),
+//        );
+//      }
+//
+//      if (cubicBezierShapeTransition.control2X !== undefined) {
+//        const { to, easing, interpolation } =
+//          cubicBezierShapeTransition.control2X;
+//        res.control2X.wrap(
+//          interpolation(fromValue.control2X, to, easing(progress)),
+//        );
+//      }
+//
+//      if (cubicBezierShapeTransition.control2Y !== undefined) {
+//        const { to, easing, interpolation } =
+//          cubicBezierShapeTransition.control2Y;
+//        res.control2Y.wrap(
+//          interpolation(fromValue.control2Y, to, easing(progress)),
+//        );
+//      }
+//
+//      if (cubicBezierShapeTransition.endX !== undefined) {
+//        const { to, easing, interpolation } = cubicBezierShapeTransition.endX;
+//        res.endX.wrap(interpolation(fromValue.endX, to, easing(progress)));
+//      }
+//
+//      if (cubicBezierShapeTransition.endY !== undefined) {
+//        const { to, easing, interpolation } = cubicBezierShapeTransition.endY;
+//        res.endY.wrap(interpolation(fromValue.endY, to, easing(progress)));
+//      }
+//
+//      return res;
+//    });
+//  };
+//}
 
 export type ShapeInterpolation = (
   from: ReactiveValue<Shape | undefined>,
