@@ -10,5 +10,5 @@ export * from './rectangle';
 export * from './path';
 
 export * from './circle-shape-builder';
-export * from './line-shape-builder';
+export * from './line-shape-transition-builder';
 export * from './rectangle-shape-builder';

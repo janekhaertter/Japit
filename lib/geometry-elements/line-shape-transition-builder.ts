@@ -1,7 +1,10 @@
-import { Transition } from 'lib/animation';
 import { Coordinate, Position } from 'lib/data-types';
 import { Easing, easeJumpToEnd } from 'lib/easing';
-import { Interpolation, interpolateCoordinate } from 'lib/interpolation';
+import {
+  Interpolation,
+  interpolateCoordinate,
+  interpolateOptionalNumber,
+} from 'lib/interpolation';
 import {
   PrimitiveReactiveValue,
   SimpleWrappedReactiveValue,
@@ -11,13 +14,6 @@ import { Context, RequestObject } from 'lib/request-object';
 
 import { GeometryElement } from './geometry-element';
 import { Line } from './line';
-
-export type LineShapeTransition = {
-  startX: Transition<Coordinate | undefined> | undefined;
-  startY: Transition<Coordinate | undefined> | undefined;
-  endX: Transition<Coordinate | undefined> | undefined;
-  endY: Transition<Coordinate | undefined> | undefined;
-};
 
 export class LineShapeTransitionBuilder {
   private _context: Context;
@@ -42,12 +38,14 @@ export class LineShapeTransitionBuilder {
       const startY = element.getStartY().unwrap();
       const endX = element.getEndX().unwrap();
       const endY = element.getEndY().unwrap();
+      const pathLength = element.getPathLength().unwrap();
 
       const line = new Line();
       line.x1.wrap(startX);
       line.y1.wrap(startY);
       line.x2.wrap(endX);
       line.y2.wrap(endY);
+      line.pathLength.wrap(pathLength);
 
       this._updatedShapes.set(element, line);
     });
@@ -277,5 +275,31 @@ export class LineShapeTransitionBuilder {
     this.endY(y, { easing, interpolation });
 
     return this;
+  }
+
+  /**
+   * Transitions the path length of the line.
+   * @param pathLength - The path length to transition to.
+   * @param easing - The easing function to use.
+   * @param interpolation - The interpolation function to use.
+   * @returns The current {@link LineShapeTransitionBuilder} instance.
+   * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/pathLength
+   */
+  public pathLength(
+    pathLength: RequestObject<number | undefined> | number | undefined,
+    {
+      easing = easeJumpToEnd,
+      interpolation = interpolateOptionalNumber,
+    }: {
+      easing?: Easing;
+      interpolation?: Interpolation<number | undefined>;
+    } = {},
+  ): LineShapeTransitionBuilder {
+    return this._plainHelper(
+      pathLength,
+      { easing, interpolation },
+      (line) => line.pathLength,
+      (element) => element.getPathLength(),
+    );
   }
 }

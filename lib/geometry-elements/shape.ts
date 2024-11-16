@@ -81,4 +81,8 @@ export abstract class Shape {
   public toRectangle(): Rectangle | undefined {
     return undefined;
   }
+
+  public getPathLength(): ReactiveValue<number | undefined> {
+    return ensureReactive(undefined);
+  }
 }

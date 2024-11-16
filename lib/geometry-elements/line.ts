@@ -24,6 +24,8 @@ export class Line extends Shape {
     new SimpleWrappedReactiveValue(ensureReactive(undefined));
   public y2: SimpleWrappedReactiveValue<Coordinate | undefined> =
     new SimpleWrappedReactiveValue(ensureReactive(undefined));
+  public pathLength: SimpleWrappedReactiveValue<number | undefined> =
+    new SimpleWrappedReactiveValue(ensureReactive(undefined));
 
   protected setupAttribute(
     reactiveValue: ReactiveValue<any>,
@@ -40,11 +42,11 @@ export class Line extends Shape {
 
   constructor() {
     super();
-    this._domElement.setAttribute('pathLength', '1');
     this.setupAttribute(this.x1, 'x1');
     this.setupAttribute(this.x2, 'x2');
     this.setupAttribute(this.y1, 'y1');
     this.setupAttribute(this.y2, 'y2');
+    this.setupAttribute(this.pathLength, 'pathLength');
   }
 
   public getDomElement(): SVGElement {
@@ -195,6 +197,10 @@ export class Line extends Shape {
 
       return new Coordinate(y1Value + (y2Value - y1Value) * (2 / 3));
     });
+  }
+
+  public getPathLength(): ReactiveValue<number | undefined> {
+    return this.pathLength;
   }
 
   public toRectangle(): Rectangle | undefined {

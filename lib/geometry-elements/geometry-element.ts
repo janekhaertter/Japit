@@ -122,6 +122,8 @@ export class GeometryElement {
     new SimpleWrappedReactiveValue(ensureReactive(undefined));
   private _child: SimpleWrappedReactiveValue<SVGElement | undefined> =
     new SimpleWrappedReactiveValue(ensureReactive(undefined));
+  private _pathLength: SimpleWrappedReactiveValue<number | undefined> =
+    new SimpleWrappedReactiveValue(ensureReactive(undefined));
 
   constructor() {
     this.setupStyle(this.fill, 'fill');
@@ -268,5 +270,9 @@ export class GeometryElement {
 
   public getChild(): SimpleWrappedReactiveValue<SVGElement | undefined> {
     return this._child;
+  }
+
+  public getPathLength(): SimpleWrappedReactiveValue<number | undefined> {
+    return this._pathLength;
   }
 }
