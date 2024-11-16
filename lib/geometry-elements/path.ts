@@ -1,6 +1,5 @@
-import { Coordinate, PathData } from 'lib/data-types';
+import { PathData } from 'lib/data-types';
 import {
-  ReactiveValue,
   SimpleWrappedReactiveValue,
   ensureReactive,
 } from 'lib/reactive-values';
@@ -31,13 +30,5 @@ export class Path extends Shape {
 
   public getDomElement(): SVGElement {
     return this._domElement;
-  }
-
-  public getCenterX(): ReactiveValue<Coordinate | undefined> {
-    throw 'Not implemented';
-  }
-
-  public getCenterY(): ReactiveValue<Coordinate | undefined> {
-    throw 'Not implemented';
   }
 }
