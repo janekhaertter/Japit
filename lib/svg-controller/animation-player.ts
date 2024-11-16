@@ -16,7 +16,8 @@ export class AnimationPlayer {
   private _duration: number;
   private _progress: SimpleWrappedReactiveValue<AlphaValue>;
   private _drawing: Drawing;
-  private _running: symbol | undefined = undefined;
+  private _running: SimpleWrappedReactiveValue<symbol | undefined> =
+    new SimpleWrappedReactiveValue(new PrimitiveReactiveValue(undefined));
   private _marks: Map<Identifier, AlphaValue>;
 
   constructor({
@@ -38,6 +39,14 @@ export class AnimationPlayer {
 
   get marks(): Map<Identifier, AlphaValue> {
     return this._marks;
+  }
+
+  get progress(): SimpleWrappedReactiveValue<AlphaValue> {
+    return this._progress;
+  }
+
+  get running(): SimpleWrappedReactiveValue<symbol | undefined> {
+    return this._running;
   }
 
   private normalizedTime(absoluteTime: number): number {
@@ -62,7 +71,7 @@ export class AnimationPlayer {
   }
 
   public stop(): void {
-    this._running = undefined;
+    this._running.wrap(new PrimitiveReactiveValue(undefined));
   }
 
   public play({
@@ -82,7 +91,7 @@ export class AnimationPlayer {
     let lastUpdate: number | undefined = undefined;
 
     const id = Symbol();
-    this._running = id;
+    this._running.wrap(new PrimitiveReactiveValue(id));
 
     const specifiedTargets = [to, progress, mark]
       .map((v) => (v === undefined ? 0 : 1))
@@ -123,7 +132,7 @@ export class AnimationPlayer {
     }
 
     const callback = (timestamp: number) => {
-      if (this._running !== id) {
+      if (this._running.getValue() !== id) {
         return;
       }
 
@@ -152,7 +161,7 @@ export class AnimationPlayer {
         (direction === PlaybackDirection.Backward &&
           this._progress.getValue().getNumber() <= targetTime)
       ) {
-        this._running = undefined;
+        this._running.wrap(new PrimitiveReactiveValue(undefined));
       }
       // otherwise, request next frame
       else {
