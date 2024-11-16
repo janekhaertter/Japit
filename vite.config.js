@@ -10,7 +10,7 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, 'lib/index.ts'),
       name: 'japit',
-      fileName: 'japit',
+      fileName: 'index',
     },
     rollupOptions: {
       external: [],
