@@ -75,48 +75,21 @@ const config: Config = {
     },
     footer: {
       style: 'dark',
-      links: [
-        //{
-        //  title: 'Docs',
-        //  items: [
-        //    {
-        //      label: 'Tutorial',
-        //      to: '/docs/intro',
-        //    },
-        //  ],
-        //},
-        //{
-        //  title: 'Community',
-        //  items: [
-        //    {
-        //      label: 'Stack Overflow',
-        //      href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-        //    },
-        //    {
-        //      label: 'Discord',
-        //      href: 'https://discordapp.com/invite/docusaurus',
-        //    },
-        //    {
-        //      label: 'X',
-        //      href: 'https://x.com/docusaurus',
-        //    },
-        //  ],
-        //},
-        //{
-        //  title: 'More',
-        //  items: [
-        //    {
-        //      label: 'Blog',
-        //      to: '/blog',
-        //    },
-        //    {
-        //      label: 'GitHub',
-        //      href: 'https://github.com/facebook/docusaurus',
-        //    },
-        //  ],
-        //},
-      ],
-      copyright: `Copyright © ${new Date().getFullYear()} Japit. Built with Docusaurus.`,
+      //links: [
+      //  {
+      //    items: [
+      //      {
+      //        label: 'Legal Notice (Impressum)',
+      //        to: '/legal-notice',
+      //      },
+      //      {
+      //        label: 'Privacy Policy',
+      //        to: '/privacy-policy',
+      //      },
+      //    ],
+      //  },
+      //],
+      copyright: `Copyright © ${new Date().getFullYear()} Janek Härtter &nbsp;·&nbsp; <a href="/legal-notice">Legal Notice (Impressum)</a> &nbsp;·&nbsp; <a href="/privacy-policy">Privacy Policy</a>`,
     },
     prism: {
       theme: prismThemes.github,
