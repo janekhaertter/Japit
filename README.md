@@ -1,5 +1,4 @@
-Japit
------
+## Japit
 
 <p align="center">
   <img src="assets/japit.gif" alt="Animated Japit Logo">
@@ -10,7 +9,11 @@ Japit is a library for animating SVGs. It makes it easy to express dependencies 
 > [!CAUTION]
 > Japit is still in early development. There are going to be breaking changes!
 
-# Getting Started
+# Getting started
+
+Check out the [Getting Started](https://japit.dev/docs/getting-started/installation) guide on the website.
+
+<!-- # Getting Started
 Right now the easiest way to get started is by cloning the repository and making changes to `src/main.ts`.
 
 ```console
@@ -138,4 +141,4 @@ const player = createAnimation(svg, [
 ]);
 
 player.play();
-```
+``` -->
