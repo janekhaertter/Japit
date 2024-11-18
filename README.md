@@ -11,7 +11,7 @@ Japit is a library for animating SVGs. It makes it easy to express dependencies 
 
 # Getting started
 
-Check out the [Getting Started](https://japit.dev/docs/getting-started/installation) guide on the website.
+Check out the [Getting Started](https://japit.dev/docs/getting-started/installation) guide.
 
 <!-- # Getting Started
 Right now the easiest way to get started is by cloning the repository and making changes to `src/main.ts`.
