@@ -1,8 +1,0 @@
-{
-  "singleQuote": true,
-  "plugins": ["@trivago/prettier-plugin-sort-imports"],
-  "importOrder": ["^lib/(.*)$", "^./(.*)$"],
-  "importOrderSeparation": true,
-  "importOrderSortSpecifiers": true,
-  "importOrderGroupNamespaceSpecifiers": true
-}
