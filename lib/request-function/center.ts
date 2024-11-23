@@ -1,9 +1,10 @@
+import { Context } from '../request-object/context';
+import { RequestObjectById } from '../request-object/request-object';
+
 import { Identifier } from 'lib/animation';
 import { Coordinate, Position } from 'lib/data-types';
 import { ReactiveValue } from 'lib/reactive-values';
-
-import { Context } from './context';
-import { RequestObjectById } from './request-object';
+import { CoordinateRequestObjectById } from 'lib/request-object/coordinate-request-object';
 
 export function $center(id: Identifier): RequestCenter {
   return new RequestCenter(id);
@@ -21,7 +22,7 @@ export function $centerX(id: Identifier): RequestCenterX {
   return new RequestCenterX(id);
 }
 
-export class RequestCenterX extends RequestObjectById<Coordinate | undefined> {
+export class RequestCenterX extends CoordinateRequestObjectById {
   public getReactiveValue(
     context: Context,
   ): ReactiveValue<Coordinate | undefined> {
@@ -33,7 +34,7 @@ export function $centerY(id: Identifier): RequestCenterY {
   return new RequestCenterY(id);
 }
 
-export class RequestCenterY extends RequestObjectById<Coordinate | undefined> {
+export class RequestCenterY extends CoordinateRequestObjectById {
   public getReactiveValue(
     context: Context,
   ): ReactiveValue<Coordinate | undefined> {

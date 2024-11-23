@@ -1,9 +1,9 @@
+import { Context } from '../request-object/context';
+import { RequestObjectById } from '../request-object/request-object';
+
 import { Identifier } from 'lib/animation';
 import { Color } from 'lib/data-types';
 import { ReactiveValue } from 'lib/reactive-values';
-
-import { Context } from './context';
-import { RequestObjectById } from './request-object';
 
 export function $fill(id: Identifier): RequestFill {
   return new RequestFill(id);
