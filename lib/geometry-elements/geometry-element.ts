@@ -196,16 +196,16 @@ export class GeometryElement {
     this._domElement.replaceChildren(this.shape.getValue().getDomElement());
   }
 
+  public getCenter(): ReactiveValue<Position | undefined> {
+    return coordinatesToPosition(this._centerX, this._centerY);
+  }
+
   public getCenterX(): SimpleWrappedReactiveValue<Coordinate | undefined> {
     return this._centerX;
   }
 
   public getCenterY(): SimpleWrappedReactiveValue<Coordinate | undefined> {
     return this._centerY;
-  }
-
-  public getCenter(): ReactiveValue<Position | undefined> {
-    return coordinatesToPosition(this._centerX, this._centerY);
   }
 
   public getRadius(): SimpleWrappedReactiveValue<Length | undefined> {
@@ -252,12 +252,20 @@ export class GeometryElement {
     return this._endY;
   }
 
+  public getControl1(): ReactiveValue<Position | undefined> {
+    return coordinatesToPosition(this._control1X, this._control1Y);
+  }
+
   public getControl1X(): SimpleWrappedReactiveValue<Coordinate | undefined> {
     return this._control1X;
   }
 
   public getControl1Y(): SimpleWrappedReactiveValue<Coordinate | undefined> {
     return this._control1Y;
+  }
+
+  public getControl2(): ReactiveValue<Position | undefined> {
+    return coordinatesToPosition(this._control2X, this._control2Y);
   }
 
   public getControl2X(): SimpleWrappedReactiveValue<Coordinate | undefined> {
