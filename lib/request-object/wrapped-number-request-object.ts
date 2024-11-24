@@ -20,6 +20,10 @@ export abstract class WrappedNumberRequestObject<
 > extends RequestObject<T | undefined> {
   protected abstract _factory: (value: number) => T;
 
+  public get factory(): (value: number) => T {
+    return this._factory;
+  }
+
   public add(...others: (number | WrappedNumberRequestObject<T>)[]) {
     return new ArithmeticalWrappedNumbersRequestObject<T>(
       this._factory,
@@ -97,6 +101,43 @@ export abstract class WrappedNumberRequestObject<
       this,
       (value) => new Percentage(value),
     );
+  }
+
+  public or(defaultValue: number | T) {
+    return new OrWrappedNumberRequestObject(this, defaultValue);
+  }
+}
+
+export class OrWrappedNumberRequestObject<
+  T extends WrappedNumber,
+> extends WrappedNumberRequestObject<T> {
+  protected _factory: (value: number) => T;
+  private _wrappedNumberRequestObject: WrappedNumberRequestObject<T>;
+  private _defaultValue: T;
+
+  constructor(
+    wrappedNumberRequestObject: WrappedNumberRequestObject<T>,
+    defaultValue: number | T,
+  ) {
+    super();
+    this._factory = wrappedNumberRequestObject.factory;
+    this._wrappedNumberRequestObject = wrappedNumberRequestObject;
+    this._defaultValue =
+      typeof defaultValue === 'number'
+        ? this._factory(defaultValue)
+        : defaultValue;
+  }
+
+  public getReactiveValue(context: Context): ReactiveValue<T | undefined> {
+    const reactiveValue =
+      this._wrappedNumberRequestObject.getReactiveValue(context);
+    return new FunctionalReactiveValue([reactiveValue], () => {
+      const value = reactiveValue.getValue();
+      if (value === undefined) {
+        return this._defaultValue;
+      }
+      return value;
+    });
   }
 }
 
