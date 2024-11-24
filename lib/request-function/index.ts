@@ -3,6 +3,7 @@ export * from './request-function';
 export * from './center';
 export * from './control-points';
 export * from './cursor';
+export * from './endpoints';
 export * from './fill';
 export * from './opacity';
 export * from './path-length';

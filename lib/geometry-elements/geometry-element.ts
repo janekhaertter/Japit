@@ -236,12 +236,20 @@ export class GeometryElement {
     return this._radiusY;
   }
 
+  public getStart(): ReactiveValue<Position | undefined> {
+    return coordinatesToPosition(this._startX, this._startY);
+  }
+
   public getStartX(): SimpleWrappedReactiveValue<Coordinate | undefined> {
     return this._startX;
   }
 
   public getStartY(): SimpleWrappedReactiveValue<Coordinate | undefined> {
     return this._startY;
+  }
+
+  public getEnd(): ReactiveValue<Position | undefined> {
+    return coordinatesToPosition(this._endX, this._endY);
   }
 
   public getEndX(): SimpleWrappedReactiveValue<Coordinate | undefined> {
